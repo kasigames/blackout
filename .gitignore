@@ -1,5 +1,4 @@
 .DS_Store
-.claude/settings.local.json
-*.zip
-prototype-v2 old.html
-renaissance-battle.html
+.claude/
+CLAUDE.md
+IDEAS.md
