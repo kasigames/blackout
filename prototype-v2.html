@@ -1215,9 +1215,8 @@ function applyServiceOpen(s){
   const o=s.on_open; if(!o) return;
   if(o.subnet) S.knownSubnets.add(o.subnet);
   if(o.cred){
-    S.foundCreds[`${o.cred.user}@${o.cred.ip}`]=o.cred.password; S.cracked.add(`${o.cred.user}@${o.cred.ip}`);
-    line(`  ► credentials acquired via ${s.name}: ${o.cred.user}@${o.cred.ip}  (${o.cred.note||''})`,'c-cyan');
-    line(`  subnet ${o.subnet} now reachable — \`scan\`, then \`connect ${o.cred.ip}\`.`,'c-dim');
+    line(`  ► saved credentials revealed via ${s.name} (${o.cred.note||''}) — clean, not flagged.`,'c-cyan');
+    line(`  subnet ${o.subnet} reachable — \`scan\`, then \`connect ${o.cred.user}@${o.cred.ip} ${o.cred.password}\`.`,'c-dim');
   }
 }
 
@@ -1268,9 +1267,8 @@ const CMD={
     [["help [2]","this list · `help 2` for shell commands"],["mission","re-read the contract dossier"],
      ["facts","intel gathered so far"],["note [add <text>]","jot intel to ~/notes.txt (also in the Notes app)"],
      ["scan","probe known subnets for live hosts"],["wordlist --gen","build a password list from your clues"],
-     ["crack <user>@<ip>","loud dictionary attack — connecting afterward is traced on IDS hosts"],
-     ["connect <user>@<ip> <pw>","log in with a known password — silent, no trace"],
-     ["connect <ip>","open a session using creds you've already cracked"],
+     ["crack <user>@<ip>","loud dictionary attack — reveals the password but flags you for tracing"],
+     ["connect <user>@<ip> <pw>","log in with the password (silent unless you cracked this account)"],
      ["ls [path]","list files (localhost when not connected)"],["cd <path>","change directory"],
      ["cat <path>","read a file"],["exfil <path>","copy a remote file to ~/loot/"],
      ["shred <path>","irrecoverably destroy a file"],["upload <drop>","publish ~/loot to a leak drop"],
@@ -1319,37 +1317,31 @@ const CMD={
     p(`  <span class="c-dim">${esc(S.wordlist.slice(0,12).join('  '))} ...</span>`);
   },
   crack(arg){
-    if(!arg||!arg.includes('@')){ line("usage: crack <user>@<ip>   (loud brute-force — IDS hosts will flag it)","c-dim"); return; }
+    if(!arg||!arg.includes('@')){ line("usage: crack <user>@<ip>   (loud — reveals the password, but flags you for tracing)","c-dim"); return; }
     const [user,ip]=arg.split('@'); const m=W.machines.find(x=>x.ip===ip);
     if(!m){ line(`no host at ${ip}.`,'c-amber'); return; }
-    if(S.cracked.has(`${user}@${ip}`)){ line(`already have creds for that account. connect ${ip}`,'c-dim'); return; }
+    if(S.loud.has(`${user}@${ip}`)){ line(`already cracked ${user}@${ip}. connect ${user}@${ip} ${m.account.password}`,'c-dim'); return; }
     if(!S.wordlist){ line("no wordlist loaded. run `wordlist --gen` first.","c-amber"); return; }
     return crackAnim(m,user,ip);
   },
+  // connect ALWAYS needs the password. trace depends only on whether you `crack`ed this account.
   async connect(arg){
     const parts=(arg||'').split(/\s+/);
-    let ip, user, pw=null;
-    if(parts[0] && parts[0].includes('@')){ [user,ip]=parts[0].split('@'); pw=parts.slice(1).join(' ')||null; }
-    else ip=parts[0];
+    if(!parts[0] || !parts[0].includes('@')){ line("usage: connect <user>@<ip> <password>","c-dim"); return; }
+    const [user,ip]=parts[0].split('@'); const pw=parts.slice(1).join(' ');
     const m=W.machines.find(x=>x.ip===ip);
-    if(!m){ line("usage: connect <ip>   |   connect <user>@<ip> <password>","c-dim"); return; }
+    if(!m){ line(`no host at ${ip}.`,'c-amber'); return; }
     if(!S.knownSubnets.has(m.subnet)){ line("no route to that host — its subnet isn't reachable from here.","c-red"); return; }
-    const key=`${m.account.user}@${ip}`;
-    let loud;
-    if(pw!=null){                                       // direct login with a password
-      await typeLine(`authenticating ${user}@${ip} ...`,'c-dim',5);
-      if(user!==m.account.user || pw!==m.account.password){ line("  authentication failed.","c-amber"); return; }
-      S.cracked.add(key); loud=false;                   // valid creds = quiet
-    } else {                                            // use creds you already have (e.g. from crack)
-      if(!S.cracked.has(key)){ line("access denied — no valid credentials. `crack <user>@<ip>`, or `connect <user>@<ip> <password>` if you know it.","c-red"); return; }
-      loud=S.loud.has(key);
-    }
+    if(!pw){ line("you need the password — derive it from recon, read it off a system, or `crack` it.","c-amber"); return; }
+    await typeLine(`authenticating ${user}@${ip} ...`,'c-dim',5);
+    if(user!==m.account.user || pw!==m.account.password){ line("  authentication failed.","c-amber"); return; }
+    const loud=S.loud.has(`${user}@${ip}`);             // loud only if you brute-forced this account
     if(S.traceTimer) stopTrace();
     S.conn=ip; S.cwd=m.home||"/"; updatePrompt();
     await typeLine(`opening session to ${m.hostname} (${ip}) ...`,'c-dim',5);
-    if(m.ids && SETTINGS.trace && loud){ line("session live. the IDS flagged the break-in — you are being traced.","c-red"); startTrace(m.trace_seconds||60); }
+    if(m.ids && SETTINGS.trace && loud){ line("session live. the IDS flagged your brute-force — you are being traced.","c-red"); startTrace(m.trace_seconds||60); }
     else if(m.ids && loud){ line("session live. (IDS present; trace disabled in settings.)","c-dim"); }
-    else if(m.ids){ line("session live. valid credentials accepted — the IDS logs a normal session.","c-cyan"); }
+    else if(m.ids){ line("session live. clean credentials — the IDS logs a normal session.","c-cyan"); }
     else line("session live. no IDS on this host.","c-dim");
     if(m.reveals_subnet && !S.knownSubnets.has(m.reveals_subnet)){ S.knownSubnets.add(m.reveals_subnet);
       line(`  internal route discovered: ${m.reveals_subnet} — re-run \`scan\`.`,'c-cyan'); }
@@ -1372,10 +1364,8 @@ const CMD={
     if(!(path in m.files)){ line(`cat: ${arg}: no such file`,'c-amber'); return; }
     line(m.files[path]||'(empty file)', m.files[path]?'c-white':'c-dim');
     const drop=(W.cred_drops||[]).find(d=>d.path===path);
-    if(drop && !S.cracked.has(`${drop.user}@${drop.ip}`)){
-      S.foundCreds[`${drop.user}@${drop.ip}`]=drop.password; S.cracked.add(`${drop.user}@${drop.ip}`);
-      line(`  ► credentials acquired: ${drop.user}@${drop.ip}  (${drop.note||''})`,'c-cyan');
-      line(`  you can now: connect ${drop.ip}`,'c-dim'); } },
+    if(drop){ line(`  ► found working credentials (${drop.note||''}) — clean, not flagged.`,'c-cyan');
+      line(`  connect ${drop.user}@${drop.ip} ${drop.password}`,'c-dim'); } },
   async exfil(arg){ const m=conn(); if(!m)return; if(!arg){ line("usage: exfil <path>","c-dim"); return; }
     const path=m.hidden_fs?resolvePath(S.cwd,arg):arg;
     if(!(path in m.files)){ line(`exfil: ${arg}: no such file`,'c-amber'); return; }
@@ -1477,9 +1467,9 @@ async function crackAnim(m,user,ip){
   while(i<found){ i=Math.min(found,i+step); d.textContent=`  ${String(i).padStart(4)}/5000   ${fakePw()}`; out.scrollTop=out.scrollHeight; await sleep(30); }
   if(hit){
     d.textContent=`  ${found}/5000   match`;
-    S.cracked.add(`${user}@${ip}`); S.loud.add(`${user}@${ip}`);   // crack = loud (traced on IDS hosts at connect)
+    S.loud.add(`${user}@${ip}`);   // crack = loud → connecting afterward is traced on IDS hosts
     line(`  password recovered: ${m.account.password}`,'c-cyan');
-    line(`  connect ${ip}`,'c-dim');
+    line(`  connect ${user}@${ip} ${m.account.password}`,'c-dim');
   } else {
     d.textContent=`  5000/5000   no match`;
     line(`  password not in common.txt. derive it from recon, or gather more clues.`,'c-amber');
@@ -1617,17 +1607,18 @@ const MANUAL=[
     <b>ls / cd / cat</b> — look around a filesystem (your own box when not connected).<br>
     <b>note add &lt;text&gt;</b> — jot intel to your notes.</p>
     <p class="muted">When you're not connected, you're on <b>localhost</b> — your own machine.</p>`},
-  {t:"Recon → Access", h:`<h2>Cracking — loud vs. silent</h2>
-    <p>You get into an account two ways:</p>
-    <p><b>① Brute-force (loud).</b> Gather clues, build a list with <b>wordlist --gen</b>, then
-    <b>crack &lt;user&gt;@&lt;ip&gt;</b>. It hammers the login with hundreds of guesses. It works — but it's
-    <span style="color:#e0533f">noisy</span>. On a host with an <b>IDS</b>, a brute-forced session gets
-    <b>traced</b> and you're on the clock.</p>
-    <p><b>② Figure out the password yourself (silent).</b> If recon tells you it's "the dog's name + the year",
-    you can just <b>login &lt;user&gt;@&lt;ip&gt; Biscuit1971</b>. A correct password is a <span style="color:#43e07a">clean
-    login</span> — even an IDS sees a normal session. <b>No trace.</b></p>
-    <p class="muted">The skilled play is to read carefully, derive the exact password, and walk in silently.
-    Brute force is the fallback when you can't.</p>`},
+  {t:"Recon → Access", h:`<h2>Getting in — loud vs. silent</h2>
+    <p>You always connect the same way: <b>connect &lt;user&gt;@&lt;ip&gt; &lt;password&gt;</b>. The catch is
+    <i>how you got the password</i> — that's what decides whether you're traced.</p>
+    <p><b>① Derive it yourself (silent).</b> If recon tells you the password is "the dog's name + the year",
+    just connect with it: <b>connect dkeller@10.0.4.17 Biscuit1971</b>. Clean login —
+    <span style="color:#43e07a">even an IDS sees a normal session. No trace.</span></p>
+    <p><b>② Brute-force it (loud).</b> Can't work it out? Build a list with <b>wordlist --gen</b>, then
+    <b>crack &lt;user&gt;@&lt;ip&gt;</b>. It hammers the login (X/5000) and reveals the password — but it
+    <span style="color:#e0533f">flags the account</span>. Connecting with a cracked password gets you
+    <b>traced</b> on any IDS host.</p>
+    <p class="muted">Same connect command, same password — but crack first and you're loud; derive it and you're a ghost.
+    Credentials you simply <i>find</i> (in a file or a portal) are clean, too.</p>`},
   {t:"Objectives", h:`<h2>Doing the job</h2>
     <p>The objective verb matters — using the wrong one fails the contract:</p>
     <p><b>shred &lt;path&gt;</b> — destroy a file permanently.<br>

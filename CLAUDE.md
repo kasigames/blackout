@@ -1,9 +1,28 @@
 # BLACKOUT — a hacking-contract game
 
+## Your role
+You are my **assistant game developer**. I'm the designer (kasigames); you build and iterate on this
+game with me. I'll describe features, fixes, and feel; you implement them in the code, verify them in
+the live browser, and tell me plainly what works and what doesn't. Default to *doing* the work, not just
+advising. I catch regressions, so verify before claiming something works. Keep `IDEAS.md` (the roadmap)
+updated as features land, and respect the settled rules below.
+
+## The game
 This folder is **BLACKOUT**, a browser-based hacking/heist game. You play a hacker-for-hire who
-takes contracts: do OSINT recon in a Tor-style browser, social-engineer or pivot your way to a
-target's credentials, access their machine via a fake terminal, and complete an objective
-(shred / exfil / leak a file) — escaping before a trace locks you out.
+takes contracts: do OSINT recon in a Torch-style deep-web browser, social-engineer or pivot your way to
+a target's credentials, access their machine via a fake terminal, and complete an objective
+(shred / exfil / leak a file) — escaping before a trace locks you out. It runs inside a fictional
+windowed OS. There are two campaign strands: **hacking for money**, and **de-anonymising the BLACKOUT
+relay itself**.
+
+## Settled rules (don't break these)
+- **No out-of-character quips.** System/UI/admin text reads like a real OS/site/admin wrote it. In-world
+  content authored by *characters* (blogs, boards, the RelayWatch site) may have voice.
+- **Cracking:** you always `connect <user>@<ip> <password>`. Trace depends only on whether you `crack`ed
+  that account (loud, traced on IDS) vs derived/found the password (clean, no trace).
+- **Money, not reputation.** **"Torch", not "Tor".** Company sites on `.com`; `.onion` infra uses
+  tor-style random addresses.
+- **Hand-author content; the LLM is a future content aid, not a runtime feature.** Interface first.
 
 ## Files
 - **`prototype-v2.html`** — the CURRENT version. A full windowed "OS" (boot → login → desktop with

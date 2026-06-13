@@ -160,7 +160,7 @@ v1 (`prototype.html`) kept intact as a fallback. v2 reuses the whole engine; the
 
 ### v2 polish round 7 (done)
 - ✅ **Version** in one shared place (`VERSION` const → boot, login screen). **README.md** added (author: kasigames). Git repo initialised; remote = github.com/kasigames/blackout (push pending user auth).
-- ✅ **Cracking redo:** `crack` = dictionary attack shown as X/5000 (common.txt); doing it marks the account *loud*. `login` merged into **`connect`**: `connect <user>@<ip> <pw>` = silent (no trace, even on IDS); `connect <ip>` uses cracked creds (loud → traced).
+- ✅ **Cracking (settled):** you ALWAYS `connect <user>@<ip> <password>`. Trace depends only on whether you `crack`ed that account. `crack` = loud dictionary attack (X/5000 from common.txt), reveals the password but flags the account → connecting is traced on IDS hosts. Deriving the password yourself, or finding it in a file/portal = clean login, no trace even on IDS. No more password-less `connect`.
 - ✅ **Quips removed** — relay admin console is now a dry operator panel (status / session log / config); the session log includes the player as one anonymous `sess#` among 911, NOT singled out. `rm -rf /` shows a realistic mount/connection error, no "you did this".
 - ✅ **Relay handle** at unlock — must pick a unique handle; ~45% "already exists" rejection, dropping to ~12% if it contains digits. Stored as `playerHandle`.
 - ✅ **"Tor" → "Torch"** throughout (Torch Browser, `torch://search`). Removed the misleading "press any key to interrupt boot" hint.
