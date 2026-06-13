@@ -20,8 +20,6 @@ It's a single self-contained HTML file — no install, no build step.
 |------|--|
 | `prototype-v2.html` | **The game.** Windowed OS: boot → login → desktop (Terminal, Torch Browser, Contracts, Notes, Files, Manual, Settings). |
 | `prototype.html` | v1 — the original two-pane prototype, kept as a fallback. |
-| `IDEAS.md` | Design roadmap & backlog. |
-| `CLAUDE.md` | Notes for working on the codebase. |
 
 ## How it plays
 
