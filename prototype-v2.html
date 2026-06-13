@@ -174,7 +174,10 @@
   #login .logo{font-size:40px;letter-spacing:10px;color:var(--green)}
   #login .sub{color:var(--green-dim);letter-spacing:2px;margin-top:-10px}
   #login .av{width:90px;height:90px;border-radius:50%;background:#0e1510;border:1px solid var(--green-dim);display:flex;align-items:center;justify-content:center;font-size:38px;margin-top:14px}
-  #login .uname{color:#cfe;letter-spacing:1px}
+  #login .uname{color:#9fb6a6;letter-spacing:1px;font-size:12px}
+  #login-user{background:#0a0f0a;border:1px solid var(--green-dim);color:var(--green);border-radius:6px;padding:9px 14px;font-family:var(--mono);font-size:14px;text-align:center;outline:none;width:220px}
+  #login-user:focus{box-shadow:0 0 14px rgba(67,224,122,.2)}
+  #login-msg{color:var(--green-dim);font-size:11px;min-height:14px;max-width:300px;text-align:center}
   #login button{background:#10180f;border:1px solid var(--green-dim);color:var(--green);border-radius:7px;padding:10px 28px;cursor:pointer;font-family:var(--mono);font-size:13px}
   #login button:hover{background:#16241400;box-shadow:0 0 18px rgba(67,224,122,.25);background:#13200f}
   .hidden{display:none!important}
@@ -218,7 +221,9 @@
   <div class="logo">BLACKOUT</div>
   <div class="sub" id="login-sub">// secure operating environment</div>
   <div class="av">☠</div>
-  <div class="uname">root</div>
+  <div class="uname">choose a relay handle</div>
+  <input id="login-user" placeholder="handle" autocomplete="off" spellcheck="false" maxlength="16">
+  <div id="login-msg"></div>
   <button id="login-btn">unlock relay</button>
 </div>
 
@@ -269,8 +274,8 @@ const CONTRACTS = [
         }
       }
     ],
-    web:{ start:"tor://search.onion", sites:{
-      "tor://search.onion":{ type:"search" },
+    web:{ start:"torch://search", sites:{
+      "torch://search":{ type:"search" },
       "prolink.onion/in/diane-keller":{ discover:["city","email"],
         keywords:"diane keller lawyer attorney partner harlow dayton litigation", title:"ProLink — Diane Keller",
         html:`<h1>Diane Keller</h1><div class="muted">Senior Partner — Harlow &amp; Partners LLP · Greater Dayton Area</div>
@@ -382,8 +387,8 @@ const CONTRACTS = [
     cred_drops:[
       { path:"/home/treyes/creds.txt", user:"svc_backup", ip:"10.20.0.40", password:"Pinecone$Vault9", note:"file server backup account" }
     ],
-    web:{ start:"tor://search.onion", sites:{
-      "tor://search.onion":{ type:"search" },
+    web:{ start:"torch://search", sites:{
+      "torch://search":{ type:"search" },
       "prolink.onion/in/tom-reyes":{ discover:["hand"],
         keywords:"tom reyes veridian dynamics front desk reception los angeles", title:"ProLink — Tom Reyes",
         html:`<h1>Tom Reyes</h1><div class="muted">Front Desk Coordinator — Veridian Dynamics · Los Angeles</div>
@@ -454,8 +459,8 @@ const CONTRACTS = [
       }
     ],
     cred_drops:[],
-    web:{ start:"tor://search.onion", sites:{
-      "tor://search.onion":{ type:"search" },
+    web:{ start:"torch://search", sites:{
+      "torch://search":{ type:"search" },
       "bizdirectory.onion/vance-advisory":{ discover:["worke"],
         keywords:"marcus vance advisory private consultant fixer", title:"BizDirectory — Vance Advisory",
         html:`<h1>Vance Advisory LLC</h1><div class="muted">Private consulting · strictly by referral</div>
@@ -535,8 +540,8 @@ const CONTRACTS = [
         }
       }
     ],
-    web:{ start:"tor://search.onion", sites:{
-      "tor://search.onion":{ type:"search" },
+    web:{ start:"torch://search", sites:{
+      "torch://search":{ type:"search" },
       "prolink.onion/in/karen-wu":{ discover:["hand"],
         keywords:"karen wu procurement meridian construction buyer", title:"ProLink — Karen Wu",
         html:`<h1>Karen Wu</h1><div class="muted">Procurement Lead — Meridian Construction</div>
@@ -596,8 +601,8 @@ const CONTRACTS = [
         }
       }
     ],
-    web:{ start:"tor://search.onion", sites:{
-      "tor://search.onion":{ type:"search" },
+    web:{ start:"torch://search", sites:{
+      "torch://search":{ type:"search" },
       "prolink.onion/in/alan-voss":{ discover:["hand"],
         keywords:"alan voss halcyon pharma clinical vp doctor research", title:"ProLink — Dr. Alan Voss",
         html:`<h1>Dr. Alan Voss</h1><div class="muted">VP Clinical — Halcyon Pharma</div>
@@ -661,8 +666,8 @@ const CONTRACTS = [
         }
       }
     ],
-    web:{ start:"tor://search.onion", sites:{
-      "tor://search.onion":{ type:"search" },
+    web:{ start:"torch://search", sites:{
+      "torch://search":{ type:"search" },
       "atriumcapital.com":{ keywords:"atrium capital investment firm private equity home",
         title:"Atrium Capital", html:`<div class="brand"><div class="bz">A</div><h1>Atrium Capital</h1></div>
           <div class="nav"><a data-url="atriumcapital.com">Home</a><a data-url="atriumcapital.com/about">About</a><a data-url="atriumcapital.com/team">Team</a><a data-url="atriumcapital.com/careers">Careers</a><a data-url="atriumcapital.com/news">News</a><a data-url="atriumcapital.com/contact">Contact</a></div>
@@ -745,21 +750,28 @@ const HOME = {
 
 /* ---- the persistent global web (browsable any time, no contract needed) ----
    Contracts layer their own target sites on top of this via siteMap(). ------ */
-const WEB_START='tor://search.onion';
+const WEB_START='torch://search';
 // hidden easter egg: the relay's own admin console. reachable at a worded URL or a "mess of numbers".
 const RELAY_ADMIN={ name:"BLACKOUT Relay — Operator Console", kind:"portal",
-  account:{user:"admin", password:"password"},   // ...they never changed it
-  contents_html:`<div class="card"><b>● RELAY ONLINE</b> &nbsp; 4,182 circuits &nbsp;·&nbsp; 911 active sessions &nbsp;·&nbsp; uptime 3y 41d</div>
-    <div class="card"><b>Live traffic (sampled · all sessions logged)</b><br>
-      <span class="muted">› anon_5f2 → atriumcapital.com … logged<br>
-      › anon_0aa → quikmail.onion (auth) … logged<br>
-      › anon_c19 → thehiddenwiki.onion … logged<br>
-      › <span style="color:#e0b343">root@localhost → everything you've ever done … logged</span></span></div>
-    <div class="card" style="border-color:#e0533f;color:#ffb3a8">Everyone who routes through BLACKOUT believes they're invisible.
-      From in here, they're just a list. Including you. <b>Especially you.</b></div>
-    <p class="muted">there is no logout that un-sees this. — see you on the next contract, operator.</p>` };
+  account:{user:"admin", password:"password"},
+  contents_html:`<div class="card"><b>relay status</b><br>
+      state: ONLINE &nbsp;·&nbsp; circuits: 4,182 &nbsp;·&nbsp; active sessions: 911 &nbsp;·&nbsp; uptime: 1138d</div>
+    <div class="card"><b>session log</b> <span class="muted">(tail · all metadata retained)</span>
+      <div style="font-family:monospace;font-size:11px;color:#8a94a2;margin-top:6px;line-height:1.5">
+      09:14:21  sess#48810  →  atriumcapital.com         200<br>
+      09:14:21  sess#48811  →  quikmail.onion  AUTH       200<br>
+      09:14:22  sess#48812  →  thehiddenwiki.onion        200<br>
+      09:14:22  sess#48813  →  exit/185.220.101.4         200<br>
+      09:14:23  sess#48814  →  harlowpartners.com         200<br>
+      09:14:23  sess#48815  →  leakbase.onion             200<br>
+      09:14:24  sess#48816  →  exit/91.219.237.x          200<br>
+      09:14:24  sess#48817  →  vanceadvisory.onion AUTH   200<br>
+      <span class="muted">… 911 active · full log retained 1138d ·</span> /var/log/relay/access.*.gz</div></div>
+    <div class="card"><b>config</b><br>
+      log_level = verbose &nbsp;·&nbsp; retain_metadata = indefinite &nbsp;·&nbsp; strip_client_tor = false<br>
+      export_target = /srv/relay/exports/</div>` };
 const GLOBAL_WEB={
-  "tor://search.onion":{ type:"search" },
+  "torch://search":{ type:"search" },
   "thehiddenwiki.onion":{ title:"The Hidden Wiki", keywords:"hidden wiki directory links index onion deep web start",
     html:`<h1 style="color:#7d59c9">The Hidden Wiki</h1>
       <p class="muted">An unofficial index of the deep web. Links rot fast — half of these are dead. Use at your own risk.</p>
@@ -769,7 +781,7 @@ const GLOBAL_WEB={
       · <a data-url="deepfeed.onion">DeepFeed</a> — breach &amp; leak headlines, updated daily.<br>
       · <a data-url="relaywatch.onion">RelayWatch</a> — people who think the anonymity relays aren't what they seem.</p>
       <h2>Search</h2>
-      <p>· <a data-url="tor://search.onion">TORCH</a> — deep-index search. start a target's name here.</p>
+      <p>· <a data-url="torch://search">TORCH</a> — deep-index search. start a target's name here.</p>
       <h2>Markets &amp; services</h2>
       <p class="muted">· ghostmarket.onion — <span style="color:#e0533f">offline</span><br>
       · cipherbay.onion — <span style="color:#e0533f">offline</span><br>
@@ -966,13 +978,13 @@ function buildBrowser(){
   if(WIN.browser) return;
   const dw=document.documentElement.clientWidth, dh=document.documentElement.clientHeight-42;
   const x=Math.min(560,dw*0.46)+40;
-  const rec=createWindow('browser','● TOR BROWSER',{x, y:24, w:dw-x-30, h:dh-60});
+  const rec=createWindow('browser','● TORCH BROWSER',{x, y:24, w:dw-x-30, h:dh-60});
   rec.body.innerHTML=`<div class="browser">
     <div class="tabstrip"></div>
     <div class="chrome">
       <button class="navbtn b-back">‹</button><button class="navbtn b-fwd">›</button>
       <button class="navbtn b-home" title="Home">⌂</button>
-      <div class="addr"><span class="lock">◉</span><input class="b-url" value="tor://search.onion"></div>
+      <div class="addr"><span class="lock">◉</span><input class="b-url" value="torch://search"></div>
     </div><div class="loadbar"></div><div class="page"></div></div>`;
   urlBar=rec.body.querySelector('.b-url'); pageEl=rec.body.querySelector('.page');
   rec._tabstrip=rec.body.querySelector('.tabstrip'); rec._loadbar=rec.body.querySelector('.loadbar');
@@ -1044,7 +1056,7 @@ function render(entry){
    the URL), so typing or following links never dead-ends. ~20% are genuinely "down" for texture. */
 function hashStr(s){ let h=2166136261; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
 function proceduralSite(url){
-  if(/^tor:/.test(url) || !/[a-z0-9-]+\.[a-z]{2,}/i.test(url)) return null;
+  if(/^torch:/.test(url) || !/[a-z0-9-]+\.[a-z]{2,}/i.test(url)) return null;
   const h=hashStr(url), t=h%14, pick=a=>a[h%a.length];
   if(t<2) return null;                          // ~14% genuinely unreachable
   const host=url.replace(/^\w+:\/\//,'').split('/')[0];
@@ -1256,9 +1268,9 @@ const CMD={
     [["help [2]","this list · `help 2` for shell commands"],["mission","re-read the contract dossier"],
      ["facts","intel gathered so far"],["note [add <text>]","jot intel to ~/notes.txt (also in the Notes app)"],
      ["scan","probe known subnets for live hosts"],["wordlist --gen","build a password list from your clues"],
-     ["crack <user>@<ip>","LOUD brute-force with your wordlist (traced on IDS hosts)"],
-     ["login <user>@<ip> <pw>","SILENT login if you know the exact password (no trace)"],
-     ["connect <ip>","open a session with creds you have"],
+     ["crack <user>@<ip>","loud dictionary attack — connecting afterward is traced on IDS hosts"],
+     ["connect <user>@<ip> <pw>","log in with a known password — silent, no trace"],
+     ["connect <ip>","open a session using creds you've already cracked"],
      ["ls [path]","list files (localhost when not connected)"],["cd <path>","change directory"],
      ["cat <path>","read a file"],["exfil <path>","copy a remote file to ~/loot/"],
      ["shred <path>","irrecoverably destroy a file"],["upload <drop>","publish ~/loot to a leak drop"],
@@ -1314,32 +1326,31 @@ const CMD={
     if(!S.wordlist){ line("no wordlist loaded. run `wordlist --gen` first.","c-amber"); return; }
     return crackAnim(m,user,ip);
   },
-  async login(arg){
-    const parts=(arg||'').split(/\s+/); const target=parts[0]||''; const pw=parts.slice(1).join(' ');
-    if(!target.includes('@')||!pw){ line("usage: login <user>@<ip> <password>   (silent — no brute force, no trace)","c-dim"); return; }
-    const [user,ip]=target.split('@'); const m=W.machines.find(x=>x.ip===ip);
-    if(!m){ line(`no host at ${ip}.`,'c-amber'); return; }
-    await typeLine(`authenticating ${user}@${ip} ...`,'c-dim',6);
-    if(user===m.account.user && pw===m.account.password){
-      S.cracked.add(`${user}@${ip}`);                 // quiet: NOT added to S.loud
-      line("  ✔ accepted. clean login — no noise, no alarms.","c-cyan");
-      line(`  now: connect ${ip}`,'c-dim');
-    } else line("  ✖ authentication failed.","c-amber");
-  },
   async connect(arg){
-    const m=W.machines.find(x=>x.ip===arg);
-    if(!m){ line("usage: connect <ip>  (no such host)","c-amber"); return; }
+    const parts=(arg||'').split(/\s+/);
+    let ip, user, pw=null;
+    if(parts[0] && parts[0].includes('@')){ [user,ip]=parts[0].split('@'); pw=parts.slice(1).join(' ')||null; }
+    else ip=parts[0];
+    const m=W.machines.find(x=>x.ip===ip);
+    if(!m){ line("usage: connect <ip>   |   connect <user>@<ip> <password>","c-dim"); return; }
     if(!S.knownSubnets.has(m.subnet)){ line("no route to that host — its subnet isn't reachable from here.","c-red"); return; }
-    const key=`${m.account.user}@${arg}`;
-    if(!S.cracked.has(key)){ line("access denied — no valid credentials. `crack` or `login` first.","c-red"); return; }
+    const key=`${m.account.user}@${ip}`;
+    let loud;
+    if(pw!=null){                                       // direct login with a password
+      await typeLine(`authenticating ${user}@${ip} ...`,'c-dim',5);
+      if(user!==m.account.user || pw!==m.account.password){ line("  authentication failed.","c-amber"); return; }
+      S.cracked.add(key); loud=false;                   // valid creds = quiet
+    } else {                                            // use creds you already have (e.g. from crack)
+      if(!S.cracked.has(key)){ line("access denied — no valid credentials. `crack <user>@<ip>`, or `connect <user>@<ip> <password>` if you know it.","c-red"); return; }
+      loud=S.loud.has(key);
+    }
     if(S.traceTimer) stopTrace();
-    S.conn=arg; S.cwd=m.home||"/"; updatePrompt();
-    await typeLine(`opening session to ${m.hostname} (${arg}) ...`,'c-dim',5);
-    const loud=S.loud.has(key);
-    if(m.ids && SETTINGS.trace && loud){ line("session live. ⚠ you forced your way in — the IDS is tracing you. MOVE.","c-red"); startTrace(m.trace_seconds||60); }
-    else if(m.ids && loud){ line("session live. (IDS present, but trace is disabled in settings.)","c-dim"); }
-    else if(m.ids){ line("session live. you logged in with valid credentials — the IDS sees a normal session. take your time.","c-cyan"); }
-    else line("session live. no IDS detected — take your time here.","c-dim");
+    S.conn=ip; S.cwd=m.home||"/"; updatePrompt();
+    await typeLine(`opening session to ${m.hostname} (${ip}) ...`,'c-dim',5);
+    if(m.ids && SETTINGS.trace && loud){ line("session live. the IDS flagged the break-in — you are being traced.","c-red"); startTrace(m.trace_seconds||60); }
+    else if(m.ids && loud){ line("session live. (IDS present; trace disabled in settings.)","c-dim"); }
+    else if(m.ids){ line("session live. valid credentials accepted — the IDS logs a normal session.","c-cyan"); }
+    else line("session live. no IDS on this host.","c-dim");
     if(m.reveals_subnet && !S.knownSubnets.has(m.reveals_subnet)){ S.knownSubnets.add(m.reveals_subnet);
       line(`  internal route discovered: ${m.reveals_subnet} — re-run \`scan\`.`,'c-cyan'); }
   },
@@ -1445,32 +1456,33 @@ async function systemWipe(){
   await sleep(700);
   const panic=document.createElement('div');
   panic.style.cssText='position:fixed;inset:0;z-index:999;background:#000;color:#e0533f;font-family:monospace;font-size:13px;padding:42px;white-space:pre-wrap;line-height:1.7';
-  panic.textContent="BLACKOUT — RELAY FAULT\n\n  unable to connect to relay.\n  machine architecture missing: /dev/relay0 not found.\n  the operating system is gone. you did this.\n\n  [ refresh to reinstall BLACKOUT OS ]";
+  panic.textContent="BLACKOUT relay client\n\n"+
+    "error: unable to connect to relay\n"+
+    "  /dev/relay0: No such device or address\n"+
+    "  mount: mounting /dev/relay0 on /relay failed: No such file or directory\n"+
+    "  blackwm: lost connection to display :0\n\n"+
+    "Connection to relay lost. Reload to reinitialise.";
   document.body.appendChild(panic);
 }
 
 const RAND_CHARS='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
 function fakePw(){ const n=6+Math.floor(Math.random()*7); let s=''; for(let i=0;i<n;i++) s+=RAND_CHARS[Math.floor(Math.random()*RAND_CHARS.length)]; return s; }
 async function crackAnim(m,user,ip){
-  if(user!==m.account.user){ line(`host ${m.hostname} has no local user '${user}'.`,'c-amber');
-    line(`(that may be the machine name — try the login handle from recon.)`,'c-dim'); return; }
+  if(user!==m.account.user){ line(`crack: ${m.hostname}: no such user '${user}'.`,'c-amber'); return; }
   const hit=S.wordlist.includes(m.account.password);
-  await typeLine(`brute-forcing ${user}@${ip} — ⚠ this is LOUD, the host will notice`,'c-red',4);
-  // simulate a real brute force: a counter into the hundreds + rolling candidate strings
-  const N = hit ? 120+Math.floor(Math.random()*420) : 760+Math.floor(Math.random()*500);
+  await typeLine(`crack: dictionary attack on ${user}@${ip} (wordlist: common.txt, 5000 entries)`,'c-dim',3);
+  const found = hit ? 200+Math.floor(Math.random()*4400) : 5000;   // where in the 5000 it "hits"
   const d=document.createElement('div'); d.className='c-dim'; out.appendChild(d);
-  let i=0; const step=Math.max(1,Math.round(N/45));
-  while(i<N){ i=Math.min(N,i+step); d.textContent=`  [${String(i).padStart(4)}/${N}] trying  ${fakePw()}`; out.scrollTop=out.scrollHeight; await sleep(34); }
+  let i=0; const step=Math.max(20,Math.round(found/45));
+  while(i<found){ i=Math.min(found,i+step); d.textContent=`  ${String(i).padStart(4)}/5000   ${fakePw()}`; out.scrollTop=out.scrollHeight; await sleep(30); }
   if(hit){
-    d.textContent=`  [${N}/${N}] ✔ MATCH`;
-    S.cracked.add(`${user}@${ip}`); S.loud.add(`${user}@${ip}`);
-    line(`  credentials recovered → ${user}:${m.account.password}`,'c-cyan');
-    line(`  ⚠ that hammering was noisy. on an IDS host this session will be TRACED.`,'c-amber');
-    line(`  (skilled play: work the password out yourself, then \`login ${user}@${ip} <password>\` — silent, no trace.)`,'c-dim');
-    line(`  now: connect ${ip}`,'c-dim');
+    d.textContent=`  ${found}/5000   match`;
+    S.cracked.add(`${user}@${ip}`); S.loud.add(`${user}@${ip}`);   // crack = loud (traced on IDS hosts at connect)
+    line(`  password recovered: ${m.account.password}`,'c-cyan');
+    line(`  connect ${ip}`,'c-dim');
   } else {
-    d.textContent=`  exhausted ${N} candidates — no match.`;
-    line(`  password isn't in your wordlist. gather more clues, or derive it and \`login\`.`,'c-amber');
+    d.textContent=`  5000/5000   no match`;
+    line(`  password not in common.txt. derive it from recon, or gather more clues.`,'c-amber');
   }
 }
 function win(){ S.done=true; stopTrace();
@@ -1549,7 +1561,7 @@ async function boot(c){
   if(g!==runGen) return; renderDossier();
   for(const l of W.mission.briefing){ if(g!==runGen) return; await typeLine("  "+l,"c-amber",3); }
   if(g!==runGen) return;
-  line(""); line("Type `help` for commands. Recon starts in the Tor Browser →","c-dim"); line("");
+  line(""); line("Type `help` for commands. Recon starts in the Torch Browser →","c-dim"); line("");
   paintTBStatus();
 }
 
@@ -1581,7 +1593,7 @@ const MANUAL=[
     <p>You're a hacker-for-hire. You take <b>contracts</b>: dig up information on a target, work out how
     to get into their systems, and complete an objective — then get out clean.</p>
     <p>The flow of almost every job:</p>
-    <p><b>1. Recon</b> in the Tor Browser → <b>2. Work out a password</b> → <b>3. Access</b> the machine
+    <p><b>1. Recon</b> in the Torch Browser → <b>2. Work out a password</b> → <b>3. Access</b> the machine
     in the Terminal → <b>4. Do the job</b> (shred / steal / leak) → <b>5. Disconnect</b> before you're traced.</p>
     <p class="muted">Open apps from the desktop icons or the ▣ BLACKOUT menu. Windows drag, resize (corner),
     minimise/maximise/close (the three dots), and stack in the taskbar.</p>`},
@@ -1591,7 +1603,7 @@ const MANUAL=[
     <p>Pick one and a dossier appears in the Terminal: who the target is, what the objective is, and your
     window. Re-read it any time with <b>mission</b>.</p>
     <p class="muted">Abandoning a job mid-way loses progress (you'll be asked to confirm).</p>`},
-  {t:"TORCH & Browser", h:`<h2>The Tor Browser</h2>
+  {t:"TORCH & Browser", h:`<h2>The Torch Browser</h2>
     <p>Recon happens here. <b>TORCH</b> is the deep-index search — start with the target's name. Use tabs,
     back/forward, and the home (⌂) button. You can browse freely any time, even with no contract.</p>
     <p><b>Bright sites</b> (.com) are clearnet corporate pages. <b>Dark sites</b> (.onion) are the deep web —
@@ -1689,7 +1701,7 @@ function tickClock(){ const d=new Date(); document.getElementById('clock').textC
 /* ---- desktop icons + start menu ---- */
 const ICONS=[
   {id:'contracts', label:'Contracts', glyph:'☰', fn:openContracts},
-  {id:'browser',   label:'Tor Browser', glyph:'🌐', fn:()=>{ buildBrowser(); if(!currentEntry()) navigate(WEB_START); focusWindow('browser'); }},
+  {id:'browser',   label:'Torch Browser', glyph:'🌐', fn:()=>{ buildBrowser(); if(!currentEntry()) navigate(WEB_START); focusWindow('browser'); }},
   {id:'terminal',  label:'Terminal', glyph:'>_', fn:()=>{ buildTerminal(); focusWindow('terminal'); }},
   {id:'notes',     label:'Notes', glyph:'✎', fn:openNotes},
   {id:'files',     label:'Files', glyph:'▤', fn:openFiles},
@@ -1737,11 +1749,21 @@ async function bootSequence(){
   b.classList.add('hidden');
   document.getElementById('login').classList.remove('hidden');
 }
+let playerHandle='operator';
 async function login(){
   const btn=document.getElementById('login-btn'); if(btn.disabled) return;
-  btn.disabled=true;
-  const steps=['verifying key','decrypting home volume','establishing relay circuit','spawning desktop'];
-  for(const s of steps){ btn.textContent=s+' …'; await sleep(380+Math.random()*260); }
+  const inp=document.getElementById('login-user'), msg=document.getElementById('login-msg');
+  const name=(inp.value||'').trim();
+  const setMsg=(t,c)=>{ msg.textContent=t; msg.style.color=c||'var(--green-dim)'; };
+  if(!name){ setMsg('enter a handle to route through the relay.','var(--amber)'); inp.focus(); return; }
+  if(!/^[a-z0-9_]{2,16}$/i.test(name)){ setMsg('handles are 2–16 chars: letters, numbers, underscore.','var(--amber)'); return; }
+  btn.disabled=true; setMsg('registering handle on the relay …');
+  await sleep(650);
+  // the handle must be unique on the relay. digits make a collision much less likely.
+  const reject = Math.random() < (/\d/.test(name) ? 0.12 : 0.45);
+  if(reject){ setMsg(`"${name}" already exists on the relay — pick a name that doesn't exist (adding numbers helps).`,'var(--red)'); btn.disabled=false; btn.textContent='unlock relay'; return; }
+  playerHandle=name; setMsg('handle accepted.','var(--green)');
+  for(const s of ['decrypting home volume','establishing relay circuit','spawning desktop']){ btn.textContent=s+' …'; await sleep(360+Math.random()*240); }
   document.getElementById('login').classList.add('hidden');
   buildIcons(); openContracts();
   btn.disabled=false; btn.textContent='unlock relay';
@@ -1752,6 +1774,7 @@ setWallpaper();
 document.getElementById('login-sub').textContent='// secure operating environment · v'+VERSION;
 tickClock(); setInterval(tickClock,15000);
 document.getElementById('login-btn').onclick=login;
+document.getElementById('login-user').addEventListener('keydown',e=>{ if(e.key==='Enter') login(); });
 bootSequence();
 </script>
 </body>

@@ -158,6 +158,30 @@ v1 (`prototype.html`) kept intact as a fallback. v2 reuses the whole engine; the
 - ✅ **BLACKOUT relay admin easter egg** *(user idea)* — `185.220.101.99` (numeric mess) and `blackoutrelay.onion/admin`, login `admin`/`password` (the joke), revealing an operator console: "911 active sessions… root@localhost → everything you've ever done … logged… Especially you." Breadcrumbed from `relaywatch.onion`. Direct hook into the Lore & endings.
 - Decided: NOT loading the real web (WttG's is limited too) — "Unable to connect" / procedural filler instead.
 
+### v2 polish round 7 (done)
+- ✅ **Version** in one shared place (`VERSION` const → boot, login screen). **README.md** added (author: kasigames). Git repo initialised; remote = github.com/kasigames/blackout (push pending user auth).
+- ✅ **Cracking redo:** `crack` = dictionary attack shown as X/5000 (common.txt); doing it marks the account *loud*. `login` merged into **`connect`**: `connect <user>@<ip> <pw>` = silent (no trace, even on IDS); `connect <ip>` uses cracked creds (loud → traced).
+- ✅ **Quips removed** — relay admin console is now a dry operator panel (status / session log / config); the session log includes the player as one anonymous `sess#` among 911, NOT singled out. `rm -rf /` shows a realistic mount/connection error, no "you did this".
+- ✅ **Relay handle** at unlock — must pick a unique handle; ~45% "already exists" rejection, dropping to ~12% if it contains digits. Stored as `playerHandle`.
+- ✅ **"Tor" → "Torch"** throughout (Torch Browser, `torch://search`). Removed the misleading "press any key to interrupt boot" hint.
+- TODO content: most contract company sites should be `.com`; any company infra on `.onion` should use tor-style random/numeric addresses (do in the web pass).
+
+### Two strands (the spine — user framing)
+The game is being built around two parallel campaigns:
+1. **Hacking for money** — the contract loop (money only; no reputation system).
+2. **De-anonymising the relay** — uncovering/【ending】 BLACKOUT itself. Seeds in place: `relaywatch.onion`, the relay admin console (`185.220.101.99` / `blackoutrelay.onion/admin`), the interruptible boot.
+
+### Strand 2 — privilege-escalation chain  *(user idea, design)*
+A multi-step path toward the relay:
+- interrupt boot → **escalate** (root on your own box / a relay node) → **scan** → log into an important server →
+  explore for an **encrypted file** → **decrypt** it (a `decrypt` tool, maybe bought in a Shop / its own contract) →
+  the decrypted data yields the **relay admin portal + an IP to a core machine** →
+  final choice: **shred the relay system**, **report it** (police/press), etc. → multiple endings.
+- Needs: a boot-interrupt that actually branches, an `escalate` mechanic, encrypted-file + `decrypt` tooling, a Shop.
+
+### Desktop & downloads  *(user idea)*
+- Give the file system a **desktop / icon view**, and let the player **download** `.txt`/files from web pages to `~/loot` (or a Downloads folder) and open them in a viewer. Ties the browser and the file system together.
+
 ### Web-building plan (the next big push — user priority)
 Goal: a genuinely full, believable fake deep-web + clearnet, hand-authored. NOT real-internet browsing
 (iframes are blocked by most real sites + it breaks immersion; emulate instead, like Welcome to the Game).
