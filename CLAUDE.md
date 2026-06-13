@@ -57,6 +57,10 @@ relay itself**.
 - Keep it self-contained and dependency-free (external image hosts: randomuser.me, picsum.photos).
 - Pages must read as real — no out-of-character "(this is a decoy)" text.
 - When a contract's objective is `exfil`/`leak`, shredding the target FAILS it (wrong verb).
+- **Git/versioning:** repo is github.com/kasigames/blackout (`main`). `VERSION` in `prototype-v2.html` is
+  the single source of truth (README mirrors it). Don't bump on every push; bump at meaningful milestones,
+  then `git tag -a vX.Y.Z` and push the tag. Git history preserves every older version automatically.
+  Push freely (the user has authed `gh`).
 
 ## Direction (as of this writing)
 - Priority: make the interface & interactables solid; **hand-author** contracts and a richer fake
