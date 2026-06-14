@@ -783,9 +783,22 @@ const GLOBAL_WEB={
       <h2>Search</h2>
       <p>· <a data-url="torch://search">TORCH</a> — deep-index search. start a target's name here.</p>
       <h2>Markets &amp; services</h2>
-      <p class="muted">· ghostmarket.onion — <span style="color:#e0533f">offline</span><br>
-      · cipherbay.onion — <span style="color:#e0533f">offline</span><br>
-      · escrowhaus.onion — <span style="color:#e0533f">seized</span></p>` },
+      <p class="muted">· <a data-url="ghostmarket.onion">ghostmarket.onion</a> — <span style="color:#e0533f">offline</span><br>
+      · <a data-url="cipherbay.onion">cipherbay.onion</a> — <span style="color:#e0533f">offline</span><br>
+      · <a data-url="escrowhaus.onion">escrowhaus.onion</a> — <span style="color:#e0533f">seized</span></p>` },
+  "ghostmarket.onion":{ title:"GhostMarket — offline", keywords:"ghostmarket market offline down",
+    html:`<h1 style="color:#e0533f">503 — service unavailable</h1>
+      <p class="muted">ghostmarket.onion is not responding. The hidden service has been offline for some time.</p>
+      <p class="muted">If you are the operator, check your tor configuration and descriptor.</p>` },
+  "cipherbay.onion":{ title:"CipherBay — offline", keywords:"cipherbay market offline down",
+    html:`<h1 style="color:#e0533f">unable to connect</h1>
+      <p class="muted">cipherbay.onion refused the connection. The address may be wrong, or the service is gone.</p>` },
+  "escrowhaus.onion":{ title:"EscrowHaus — seized", keywords:"escrowhaus escrow seized takedown law enforcement",
+    html:`<div style="border:2px solid #e0533f;border-radius:6px;padding:18px;text-align:center;background:#1a0d0d">
+      <h1 style="color:#e0533f;margin:.2em">⚠ THIS HIDDEN SERVICE HAS BEEN SEIZED</h1>
+      <p>This site and the criminal activity it facilitated have been taken down as part of a joint
+      international law-enforcement operation.</p>
+      <p class="muted">Operation codename redacted · Funds and records secured · Vendors identified.</p></div>` },
   "nightowl.onion":{ title:"NightOwl", keywords:"nightowl blog diary personal insomnia night writing",
     html:`<h1 style="color:#cdb">NightOwl</h1><div class="muted">a blog by nobody in particular · updated whenever</div>
       <div class="post"><b>3:14am</b><br>Can't sleep again. The city's quiet enough that I can hear the relays humming
@@ -834,9 +847,7 @@ const GLOBAL_WEB={
       everything that everyone routes through it.</p>
       <p class="muted">We're not saying they're abusing it. We're saying you should ask who they are, and what they want.
       A tool that hides everyone is also a tool that watches everyone.</p>
-      <p class="muted">— if you operate a relay and you're reading this: we know.</p>
-      <p class="muted" style="font-size:11px">[update] a reader found BLACKOUT's own operator console exposed at
-      <b>185.220.101.99</b> (also <b>blackoutrelay.onion/admin</b>). It's probably still up. They never change the password.</p>` },
+      <p class="muted">— if you operate a relay and you're reading this: we know.</p>` },
   "blackoutrelay.onion/admin":{ type:"service", title:"BLACKOUT Relay — Admin", keywords:"blackout relay admin operator console login", service:RELAY_ADMIN },
   "185.220.101.99":{ type:"service", title:"BLACKOUT Relay — Admin", keywords:"blackout relay admin operator console", service:RELAY_ADMIN }
 };
@@ -1758,6 +1769,7 @@ async function login(){
   btn.disabled=false; btn.textContent='unlock relay';
 }
 
+resetState();   // initialise S.* so free-roam browsing (services etc.) works before any contract
 applySettings();
 setWallpaper();
 document.getElementById('login-sub').textContent='// secure operating environment · v'+VERSION;
