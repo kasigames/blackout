@@ -1026,15 +1026,13 @@ function showLoading(url){
     <div class="muted" style="font-size:11px">routing through ${hops.map(h=>h).join(' → ')} relays…</div></div>`;
 }
 let loadbarTimer=null;
+// fully self-contained: fills over the load delay then fades on its own timer (can't get stuck)
 function startLoadbar(d){ const lb=WIN.browser&&WIN.browser._loadbar; if(!lb)return;
   clearTimeout(loadbarTimer);
   lb.style.transition='none'; lb.style.width='0%'; lb.style.opacity='1'; lb.offsetWidth;
-  lb.style.transition=`width ${d}ms cubic-bezier(.1,.7,.25,1)`; lb.style.width='90%'; }
-// only acts if the bar is actually showing — so it's a safe no-op on instant navigations
-function finishLoadbar(){ const lb=WIN.browser&&WIN.browser._loadbar; if(!lb||lb.style.opacity!=='1')return;
-  clearTimeout(loadbarTimer);
-  lb.style.transition='width .12s ease-out, opacity .3s'; lb.style.width='100%';
-  loadbarTimer=setTimeout(()=>{ lb.style.opacity='0'; lb.style.width='0%'; },160); }
+  lb.style.transition=`width ${d}ms cubic-bezier(.2,.8,.2,1)`; lb.style.width='100%';
+  loadbarTimer=setTimeout(()=>{ lb.style.transition='opacity .35s'; lb.style.opacity='0'; }, d+150); }
+function finishLoadbar(){}  // no-op: bar lifecycle now lives entirely in startLoadbar
 function render(entry){
   finishLoadbar();
   if(!entry){ pageEl.innerHTML=''; if(urlBar)urlBar.value=''; updateNav(); return; }
