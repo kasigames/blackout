@@ -18,11 +18,12 @@
   /* ---- desktop ---- */
   #desktop{position:fixed;inset:0;
     background:
-      radial-gradient(1200px 700px at 70% -10%, #0b1a12, transparent),
-      linear-gradient(160deg,#05080d,#0a0c10 60%,#070a08);
+      radial-gradient(1300px 760px at 68% -8%, #18301f, transparent),
+      radial-gradient(900px 600px at 15% 110%, #112418, transparent),
+      linear-gradient(160deg,#0c141a,#121822 58%,#0e1812);
   }
   #desktop::after{content:"";position:fixed;inset:0;pointer-events:none;
-    background-image:linear-gradient(rgba(67,224,122,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(67,224,122,.025) 1px,transparent 1px);
+    background-image:linear-gradient(rgba(67,224,122,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(67,224,122,.05) 1px,transparent 1px);
     background-size:38px 38px}
   #icons{position:absolute;top:18px;left:18px;display:flex;flex-direction:column;gap:18px;z-index:1}
   .dicon{width:78px;text-align:center;color:#b9c6bd;cursor:pointer;user-select:none;font-family:var(--ui);font-size:11px}
@@ -40,7 +41,7 @@
   .win-resize{position:absolute;right:0;bottom:0;width:18px;height:18px;cursor:nwse-resize;z-index:3}
   .win-resize::after{content:"";position:absolute;right:3px;bottom:3px;width:8px;height:8px;border-right:2px solid var(--green-dim);border-bottom:2px solid var(--green-dim);opacity:.5}
   .loadbar{height:2px;width:0;background:#7d59c9;opacity:0;transition:width .25s linear,opacity .25s;box-shadow:0 0 6px #7d59c9}
-  #wall{position:fixed;inset:0;z-index:0;pointer-events:none;background-repeat:no-repeat;background-position:center;background-size:cover;filter:grayscale(.55) contrast(1.05)}
+  #wall{position:fixed;inset:0;z-index:0;pointer-events:none;background-repeat:no-repeat;background-position:center;background-size:cover;filter:grayscale(.35) contrast(1.05) brightness(1.15)}
   body.theme-amber{--green:#e8b13e;--green-dim:#9a7a2a;--link:#ffcf6b}
   body.theme-ice{--green:#56cfe1;--green-dim:#2f8a99;--link:#7fd4ff}
   .win-title .t{flex:1;color:#bdffd0;font-size:12px;font-family:var(--ui);letter-spacing:.4px}
@@ -159,17 +160,27 @@
     background:rgba(8,12,8,.92);border-top:1px solid var(--border);backdrop-filter:blur(8px)}
   #start{display:flex;align-items:center;gap:7px;background:#10180f;border:1px solid var(--border);color:var(--green);border-radius:6px;padding:6px 12px;cursor:pointer;font-family:var(--mono);font-size:12px}
   #start:hover{border-color:var(--green-dim)}
+  #startmenu{position:fixed;left:10px;bottom:50px;z-index:60;min-width:180px;background:rgba(10,16,11,.97);border:1px solid var(--green-dim);border-radius:8px;padding:6px;backdrop-filter:blur(8px);box-shadow:0 12px 40px rgba(0,0,0,.6)}
+  #startmenu.hidden{display:none}
+  #startmenu .smi{display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:6px;cursor:pointer;color:#cfe;font-family:var(--ui);font-size:12px}
+  #startmenu .smi:hover{background:#16241a}
+  #startmenu .smi .g{width:18px;text-align:center;color:var(--green)}
+  #startmenu .sep{height:1px;background:var(--border);margin:5px 4px}
   #tasklist{display:flex;gap:6px;flex:1;overflow-x:auto}
   .taskbtn{display:flex;align-items:center;gap:6px;background:#0c120c;border:1px solid var(--border);color:#9fb6a6;border-radius:5px;padding:5px 11px;cursor:pointer;font-family:var(--ui);font-size:11px;white-space:nowrap}
   .taskbtn.active{border-color:var(--green-dim);color:#cfe;background:#11190f}
   .taskbtn.min{opacity:.55}
   #tb-status{color:var(--green-dim);font-size:11px;white-space:nowrap;font-family:var(--mono)}
   #tb-status .tr.live{color:var(--red);animation:blink 1s steps(2) infinite}
+  #wallet{display:flex;align-items:center;gap:6px;color:var(--amber);font-size:12px;font-family:var(--mono);background:#0c120c;border:1px solid var(--border);border-radius:6px;padding:5px 11px;white-space:nowrap}
+  #wallet .wl{color:var(--green-dim);font-size:10px;letter-spacing:.5px}
+  #wallet.bump{animation:wbump .5s ease}
+  @keyframes wbump{0%{transform:scale(1)}40%{transform:scale(1.18);color:var(--green)}100%{transform:scale(1)}}
   #clock{color:#9fb6a6;font-size:12px;font-family:var(--mono);min-width:54px;text-align:right}
 
   /* ---- boot & login ---- */
   #boot,#login{position:fixed;inset:0;z-index:100;background:#04060a;display:flex;flex-direction:column;align-items:center;justify-content:center}
-  #boot{font-family:var(--mono);color:var(--green-dim);align-items:flex-start;justify-content:flex-start;padding:40px;white-space:pre-wrap;font-size:13px;line-height:1.7}
+  #boot{font-family:var(--mono);color:var(--green-dim);align-items:flex-start;justify-content:flex-start;padding:40px;white-space:pre-wrap;font-size:13px;line-height:1.7;overflow-y:auto}
   #login{gap:20px}
   #login .logo{font-size:40px;letter-spacing:10px;color:var(--green)}
   #login .sub{color:var(--green-dim);letter-spacing:2px;margin-top:-10px}
@@ -212,8 +223,10 @@
   <button id="start">▣ BLACKOUT</button>
   <div id="tasklist"></div>
   <div id="tb-status"></div>
+  <div id="wallet" title="your balance"><span class="wl">BAL</span><span id="wallet-amt">₿0.0</span></div>
   <div id="clock">--:--</div>
 </div>
+<div id="startmenu" class="hidden"></div>
 
 <div id="crt"></div>
 <div id="boot"></div>
@@ -231,7 +244,28 @@
 /* ============================================================================
    BLACKOUT — single source of truth for the version number
    ========================================================================== */
-const VERSION = '0.6.0';
+const VERSION = '0.7.0';
+
+/* ============================================================================
+   PLAYER PROGRESS — money + completed contracts (persisted to localStorage)
+   ========================================================================== */
+const PROGRESS=Object.assign({balance:0, completed:[]},
+  (()=>{ try{ return JSON.parse(localStorage.getItem('blackout_progress')||'{}'); }catch(e){ return {}; } })());
+function saveProgress(){ try{ localStorage.setItem('blackout_progress',JSON.stringify(PROGRESS)); }catch(e){} }
+// payouts are written as "₿0.4" strings; parse the number out for arithmetic.
+function parsePayout(s){ const m=String(s||'').match(/([\d.]+)/); return m?parseFloat(m[1]):0; }
+function fmtBtc(n){ return '₿'+(Math.round(n*100)/100).toFixed(1).replace(/\.0$/,'.0'); }
+function updateWallet(bump){
+  const el=document.getElementById('wallet-amt'); if(!el) return;
+  el.textContent=fmtBtc(PROGRESS.balance);
+  if(bump){ const w=document.getElementById('wallet'); if(w){ w.classList.remove('bump'); void w.offsetWidth; w.classList.add('bump'); } }
+}
+function awardPayout(contract){
+  if(!contract) return;
+  PROGRESS.balance += parsePayout(contract.payout);
+  if(contract.id && !PROGRESS.completed.includes(contract.id)) PROGRESS.completed.push(contract.id);
+  saveProgress(); updateWallet(true);
+}
 
 /* ============================================================================
    CONTRACTS  (same schema the local LLM will fill later — engine never calls AI)
@@ -734,6 +768,117 @@ const CONTRACTS = [
     }},
     solution_path:["search atrium→site→/team (find Nina Cole, the EA)","search Nina→friendwall (Pixel+1994)","/careers→email format+subnet → ncole@atriumcapital.com","portal login ncole/Pixel1994","portal reveals gpike workstation creds+subnet","scan→connect gpike-ws→exfil project_atlas.pdf→disconnect"]
   }
+},
+{
+  id:"the-favour", name:"The Favour", difficulty:"MEDIUM", payout:"₿1.1",
+  tags:["SINGLE TARGET","SOCIAL ENG.","LEAK"],
+  desc:"A jittery client is certain his oldest friend is keeping a file on him — and might use it. He wants that file pulled and dropped to him, quietly. It's a personal laptop: no monitoring, no trace. But you'll have to read a man's whole life to guess his password.",
+  world:{
+    mission:{
+      handle:"root", gender:"male",
+      target_name:"Marcus Bell", target_role:"Portrait photographer · the client's closest friend",
+      objective_type:"leak", target_artifact:"/home/mbell/private/about_daniel.txt",
+      leak_dest:"vaultdrop.onion",
+      constraint:"the client wants it tonight — before he 'has it out' with Marcus in person",
+      briefing:[
+        "Our client — Daniel — is convinced his oldest friend Marcus Bell has",
+        "been keeping notes on him. He wants the file, not a confrontation.",
+        "Get onto Marcus's personal laptop, find what he's hiding in ~/private,",
+        "EXFIL it, then `disconnect` and `upload vaultdrop.onion` — that's the",
+        "client's drop. It's a home machine: no IDS, no trace. The lock is the",
+        "password — Marcus lives out loud online, so reason it out. Don't destroy",
+        "anything. Daniel wants to read it himself."
+      ]
+    },
+    facts:{
+      pet:{label:"Dog's name", value:"Rusty", type:"cred"},
+      year:{label:"Birth year", value:"1989", type:"cred"},
+      studio:{label:"Studio name", value:"truenorth", type:"cred"},
+      handle:{label:"Login handle", value:"mbell", type:"lead"},
+      net:{label:"Home network", value:"172.16.9.0/24", type:"lead"}
+    },
+    machines:[
+      { ip:"172.16.9.24", hostname:"mbell-laptop", label:"Marcus Bell — personal laptop",
+        subnet:"172.16.9.0/24", exposed:true, ids:false, hidden_fs:false, home:"/home/mbell",
+        account:{user:"mbell", password:"Rusty1989"},
+        files:{
+          "/home/mbell/private/about_daniel.txt":"[txt] Notes on Daniel.\n\nI keep this because I don't know what else to do with it. Daniel's not okay. The drinking is back, he's sure everyone's against him, and last month he accused me — ME — of \"feeding information to people.\" I wrote down dates so that if he ever asks, I can show him it's all in his head. The fishing trip. The hospital visit I drove him to. The loan I never asked back. This isn't a file against him. It's the opposite. It's everything I've done so he can't say I wasn't there.\n\nIf you're reading this and you're not me: please don't make this into something it isn't.",
+          "/home/mbell/private/journal.txt":"[txt] mostly empty lately. last entry: 'told D I'd always pick up the phone. meant it. wish he believed it.'",
+          "/home/mbell/photos/portfolio/README":"[dir] client galleries — weddings, portraits, a few editorial sets. backed up nightly to the NAS.",
+          "/home/mbell/notes.txt":"reminder: stop reusing the dog+year for everything. (I won't.)"
+        }
+      }
+    ],
+    web:{ start:"torch://search", sites:{
+      "torch://search":{ type:"search" },
+      "prolink.onion/in/marcus-bell":{ discover:["handle","studio"],
+        keywords:"marcus bell photographer portrait truenorth studio freelance editorial", title:"ProLink — Marcus Bell",
+        html:`<h1>Marcus Bell</h1><div class="muted">Portrait &amp; editorial photographer · owner, TrueNorth Studio</div>
+          <div style="margin:9px 0"><span class="pill">Portraiture</span><span class="pill">Weddings</span><span class="pill">Editorial</span></div>
+          <h2>About</h2>
+          <p>Marcus has spent fifteen years behind a camera, the last six running <b>TrueNorth Studio</b> out of a
+          converted warehouse on the east side. He shoots people, mostly — the kind of portraits that take an hour
+          of talking before a single frame. "Trust first, photos second," is how he puts it.</p>
+          <p>Before TrueNorth he assisted at two commercial studios and spent a year photographing nothing but
+          musicians, which he says taught him patience and how to work in terrible light.</p>
+          <h2>Contact</h2>
+          <div class="card"><b>Booking:</b> <span class="muted">hello@truenorthstudio.com</span><br>
+          <b>Personal:</b> <span class="muted">mbell</span> on most networks — "same handle everywhere, I'm not hard to find."</div>
+          <p class="muted">"The best portrait is the one where the person forgets the camera is there."</p>` },
+      "friendwall.onion/marcus.bell":{ discover:["pet","year"],
+        keywords:"marcus bell rusty dog birthday photographer personal friends daniel", title:"FriendWall — Marcus Bell",
+        html:`<h1>Marcus B. <span class="muted" style="font-size:12px">· portrait guy, dog dad</span></h1>
+          <div class="post">Three weddings in one weekend and I can still feel my shutter finger. Worth it though —
+          the last couple cried during their first look and so did I, a little. Don't tell anyone.</div>
+          <div class="post">🐕 Twelve years today with this idiot. <b>Rusty</b> can't hear the doorbell anymore but he
+          still loses his mind when I pick up the leash. Best decision I ever made was the scruffy one at the shelter.</div>
+          <div class="post">Old friend going through it right now. Reminder to self: showing up is the whole job.
+          You don't have to fix it, you just have to keep answering the phone.</div>
+          <div class="post">Turned another year older this week — born in <b>'89</b>, which apparently makes me
+          "vintage" according to my second shooter. She's twenty-three. I let it slide.</div>
+          <div class="post muted">Studio's booked through spring. Grateful, tired, grateful.</div>` },
+      "truenorthstudio.com":{ skin:'corp', discover:["handle"],
+        keywords:"truenorth studio photography marcus bell portrait wedding booking portfolio", title:"TrueNorth Studio",
+        html:`<div class="brand"><div class="bz">▲</div><h1>TrueNorth Studio</h1></div>
+          <div class="nav"><a data-url="truenorthstudio.com">Home</a><a data-url="truenorthstudio.com/portfolio">Portfolio</a><a data-url="truenorthstudio.com/booking">Booking</a></div>
+          <img class="hero" src="https://picsum.photos/seed/truenorth-hero/680/220">
+          <p>TrueNorth is the studio of photographer <b>Marcus Bell</b> — portraits, weddings, and editorial work
+          made slowly and on purpose. No rushed sessions, no fake smiles. We talk until the camera disappears.</p>
+          <p class="muted">Booking by appointment. Galleries delivered privately to each client; nothing is posted
+          without permission.</p>
+          <div class="card"><b>Get in touch</b><br>Bookings: <span class="muted">hello@truenorthstudio.com</span>.<br>
+          Contact Marcus directly at <span class="muted">mbell@truenorthstudio.com</span>.</div>` },
+      "truenorthstudio.com/booking":{ keywords:"truenorth booking appointment session photography marcus bell closed",
+        title:"TrueNorth Studio — Booking", html:`<div class="brand"><div class="bz">▲</div><h1>Booking</h1></div>
+          <div class="nav"><a data-url="truenorthstudio.com">Home</a><a data-url="truenorthstudio.com/portfolio">Portfolio</a></div>
+          <div class="card"><b>Bookings are closed.</b><br>
+          <span class="muted">Marcus is fully booked through the spring and isn't taking new sessions right now.
+          Existing clients with a session already scheduled don't need to do anything. For anything else, email
+          <span class="muted">hello@truenorthstudio.com</span> and he'll get back to you when the calendar opens up.</span></div>
+          <p class="muted" style="font-size:11px">The online booking form has been taken down while the waitlist clears.</p>` },
+      "truenorthstudio.com/portfolio":{ keywords:"truenorth portfolio photography portrait wedding gallery marcus bell",
+        title:"TrueNorth Studio — Portfolio", html:`<div class="brand"><div class="bz">▲</div><h1>Portfolio</h1></div>
+          <div class="nav"><a data-url="truenorthstudio.com">Home</a><a data-url="truenorthstudio.com/booking">Booking</a></div>
+          <p class="muted">A small selection. Most client work stays private.</p>
+          <img class="hero" src="https://picsum.photos/seed/truenorth-port1/680/200">
+          <p>Marcus shoots almost entirely on location and natural light. The portraits below are published with
+          the sitters' consent — a rule he's never once broken, which he'll tell you about at length if you let him.</p>
+          <img class="hero" src="https://picsum.photos/seed/truenorth-port2/680/200">
+          <p class="muted">For full galleries, clients receive a private link. Backups of every shoot are kept on the
+          studio's own drive at home — "I don't trust the cloud with other people's faces."</p>` },
+      "shutterforum.onion/u/mbell":{ keywords:"marcus bell mbell photography forum gear camera lens prints",
+        title:"ShutterForum — mbell", html:`<h1>ShutterForum</h1><div class="muted">user: <b>mbell</b> · joined 6 years ago · 1,204 posts</div>
+          <div class="card"><b>Re: best laptop for culling 2000+ raws?</b><br>
+            <span class="muted">mbell:</span> Honestly whatever you have plus an SSD. I run everything off one battered
+            laptop on my home network and back up to a NAS nightly. Not glamorous. Works.</div>
+          <div class="card"><b>Re: do you password-protect client galleries?</b><br>
+            <span class="muted">mbell:</span> Always. People trust me with how they look. That's not nothing.</div>
+          <div class="card"><b>Re: thread about reused passwords</b><br>
+            <span class="muted">mbell:</span> guilty. I've used the same scheme since college and I know, I KNOW.
+            one of these days. (it's not getting changed.)</div>` }
+    }},
+    solution_path:["friendwall→Rusty+1989 (buried)","prolink/truenorth→handle mbell","laptop is exposed (172.16.9.0/24) → scan","wordlist→Rusty1989","connect mbell@172.16.9.24 (no IDS, silent) → exfil about_daniel.txt → disconnect → upload vaultdrop.onion"]
+  }
 }
 ];
 
@@ -774,21 +919,49 @@ const GLOBAL_WEB={
   "torch://search":{ type:"search" },
   "thehiddenwiki.onion":{ title:"The Hidden Wiki", keywords:"hidden wiki directory links index onion deep web start",
     html:`<h1 style="color:#7d59c9">The Hidden Wiki</h1>
-      <p class="muted">An unofficial index of the deep web. Links rot fast — half of these are dead. Use at your own risk.</p>
-      <h2>Reading &amp; chatter</h2>
-      <p>· <a data-url="nightowl.onion">NightOwl</a> — one insomniac's diary. Oddly compelling.<br>
-      · <a data-url="thepit.onion">the pit</a> — anonymous message board. mostly noise, occasionally signal.<br>
-      · <a data-url="deepfeed.onion">DeepFeed</a> — breach &amp; leak headlines, updated daily.<br>
-      · <a data-url="echochamber.onion">Echo Chamber</a> — unfiltered board. mostly conspiracy, all conviction.<br>
-      · <a data-url="thearchive_2011.onion">The Archive</a> — dead forums, old logs, ghosts of the early web.<br>
-      · <a data-url="relaywatch.onion">RelayWatch</a> — people who think the anonymity relays aren't what they seem.</p>
-      <h2>Search</h2>
-      <p>· <a data-url="torch://search">TORCH</a> — deep-index search. start a target's name here.</p>
-      <h2>Markets &amp; services</h2>
-      <p>· <a data-url="thevoidledger.onion">The Void Ledger</a> — <span style="color:#43e07a">online</span></p>
-      <p class="muted">· <a data-url="ghostmarket.onion">ghostmarket.onion</a> — <span style="color:#e0533f">offline</span><br>
-      · <a data-url="cipherbay.onion">cipherbay.onion</a> — <span style="color:#e0533f">offline</span><br>
-      · <a data-url="escrowhaus.onion">escrowhaus.onion</a> — <span style="color:#e0533f">seized</span></p>` },
+      <p class="muted">unofficial index. links rot, lie, and bite. nothing here is vouched for. half is dead,
+      some is worse than dead. you clicked your way here, you can click your way back out.</p>
+      <p class="muted" style="font-size:11px">last edit: a few hours ago, by someone. edits are unsigned. that's the point.</p>
+      <div style="line-height:2">
+      · <a data-url="torch://search">TORCH</a> <span class="muted">— deep-index search. start a name here.</span><br>
+      · <a data-url="thepit.onion">the pit</a> <span class="muted">— no names, no logs, no rules that matter.</span><br>
+      · <a data-url="thecellar.onion">the cellar</a> <span style="color:#7a3030">— you know what this is. don't.</span><br>
+      · <a data-url="deepfeed.onion">DeepFeed</a> <span class="muted">— breaches &amp; leaks. what they don't print.</span><br>
+      · <a data-url="undermarket.onion">UnderMarket</a> <span class="muted">— data &amp; access. past its prime, still open.</span><br>
+      · <a data-url="thescroll.onion">↓↓↓</a> <span class="muted">— keeps going. allegedly worth the trip.</span><br>
+      · <a data-url="signalnoise.onion">SignalNoise</a> <span class="muted">— opsec board. dry, technical, useful.</span><br>
+      · <a data-url="thevoidledger.onion">The Void Ledger</a> <span style="color:#43e07a">— online</span><br>
+      · <a data-url="meatmarket.onion">meatmarket</a> <span class="muted">— not what you're hoping it sells.</span><br>
+      · <a data-url="credbase.onion">CredBase</a> <span class="muted">— search an email. see what already leaked.</span><br>
+      · <a data-url="freebitcoin-generator.onion">FREE BTC GENERATOR</a> <span class="muted">— free money. one click. surely.</span><br>
+      · <a data-url="relaywatch.onion">RelayWatch</a> <span class="muted">— the relays aren't what they say they are.</span><br>
+      · <a data-url="ghostmarket.onion">ghostmarket</a> <span style="color:#e0533f">— offline</span><br>
+      · <a data-url="darkjobs.onion">DarkJobs</a> <span class="muted">— clients post, contractors bid. mind the scope.</span><br>
+      · <a data-url="silent-contract.onion">Silent Contract</a> <span class="muted">— discreet resolution services. discretion guaranteed.</span><br>
+      · <a data-url="nightowl.onion">NightOwl</a> <span class="muted">— an insomniac's diary. oddly compelling.</span><br>
+      · <a data-url="thekillroom.onion">the kill room</a> <span style="color:#7a3030">— flagged. reported. still up. leave it.</span><br>
+      · <a data-url="echochamber.onion">Echo Chamber</a> <span class="muted">— all conviction, no filter, some pigeons.</span><br>
+      · <a data-url="truthprotocol.onion">TRUTH PROTOCOL</a> <span class="muted">— the manifesto. mirror it before it's gone.</span><br>
+      · <a data-url="vaultdrop.onion">VaultDrop</a> <span class="muted">— dead drop. gone in 72 hours, no trace.</span><br>
+      · <a data-url="thebasement.onion">the basement</a> <span class="muted">— deeper than the cellar.</span><br>
+      · <a data-url="coldclock.onion">ColdClock</a> <span class="muted">— opsec zine for people starting to care.</span><br>
+      · <a data-url="congratulations-winner.onion">★ YOU WON ★</a> <span class="muted">— 1,000,000th visitor. claim now!!</span><br>
+      · <a data-url="whistlehub.onion">WhistleHub</a> <span class="muted">— hand documents to people who print them.</span><br>
+      · <a data-url="mixchain.onion">MixChain</a> <span style="color:#43e07a">— online</span> <span class="muted">— coins in, clean coins out.</span><br>
+      · <a data-url="feralcam.onion">feralcam</a> <span class="muted">— don't.</span><br>
+      · <a data-url="station-fifteen.onion">Station Fifteen</a> <span class="muted">— numbers. no operator. it does not reply.</span><br>
+      · <a data-url="soliloquy.onion">Soliloquy</a> <span class="muted">— someone who left the work, writing it down.</span><br>
+      · <a data-url="cipherbay.onion">cipherbay</a> <span style="color:#e0533f">— offline</span><br>
+      · <a data-url="thelace.onion">THE LACE</a> <span class="muted">— string, corkboard, conviction. partly right.</span><br>
+      · <a data-url="the-quiet-place.onion">the quiet place</a> <span class="muted">— it isn't quiet.</span><br>
+      · <a data-url="theraft.onion">The Raft</a> <span class="muted">— small, slow, invite-only. be quiet in there.</span><br>
+      · <a data-url="hello.onion">hi</a> <span class="muted">— that's the whole site. respect.</span><br>
+      · <a data-url="oldforum-backup.onion">oldforum backup</a> <span style="color:#e0533f">— 503</span><br>
+      · <a data-url="forgotten88.onion">forgotten88</a> <span class="muted">— a privacy-nerd board, frozen since 2019.</span><br>
+      · <a data-url="escrowhaus.onion">escrowhaus</a> <span style="color:#e0533f">— seized</span><br>
+      · <a data-url="thearchive_2011.onion">The Archive</a> <span class="muted">— dead threads, old logs, ghosts.</span><br>
+      · <a data-url="the-archive-mirror.onion">archive mirror</a> <span style="color:#e0533f">— not responding</span>
+      </div>` },
   "ghostmarket.onion":{ title:"GhostMarket — offline", keywords:"ghostmarket market offline down",
     html:`<h1 style="color:#e0533f">503 — service unavailable</h1>
       <p class="muted">ghostmarket.onion is not responding. The hidden service has been offline for some time.</p>
@@ -888,8 +1061,568 @@ const GLOBAL_WEB={
       A tool that hides everyone is also a tool that watches everyone.</p>
       <p class="muted">— if you operate a relay and you're reading this: we know.</p>` },
   "blackoutrelay.onion/admin":{ type:"service", title:"BLACKOUT Relay — Admin", keywords:"blackout relay admin operator console login", service:RELAY_ADMIN },
-  "185.220.101.99":{ type:"service", title:"BLACKOUT Relay — Admin", keywords:"blackout relay admin operator console", service:RELAY_ADMIN }
+  "185.220.101.99":{ type:"service", title:"BLACKOUT Relay — Admin", keywords:"blackout relay admin operator console", service:RELAY_ADMIN },
+
+  /* --- batch A: global web texture --- */
+
+  /* PURPOSE: lore — seeds BLACKOUT suspicion for strand 2. players searching "relay" or "opsec" land here. */
+  "signalnoise.onion":{ title:"SignalNoise", keywords:"opsec relay integrity board discussion technical hardware compromise anonymous nodes blackout",
+    html:`<h1>SignalNoise</h1>
+      <div class="muted">operational security · relay integrity · est. 2014 · no accounts · no logs · read and post anonymously</div>
+      <p class="muted" style="font-size:11px">this board exists because most opsec forums are either dead, compromised, or full of people who read one article. post if you have something to add.</p>
+      <div class="card"><b>[THREAD] relay audit — which nodes have verifiable operators?</b> <span class="muted pill">47 replies</span><br>
+        <div class="post"><span class="muted">null_route:</span> Compiled a list. Vermillion, Cascade, Irongate — all have audited no-log policies and at least one independent verification. BLACKOUT is not on the list. Not because I think they're dirty, but because nobody has verified them either way. No-log claims are not the same as no-log proofs.</div>
+        <div class="post"><span class="muted">anon:</span> BLACKOUT has been running for years though. If they were logging and selling you'd expect some fallout by now.</div>
+        <div class="post"><span class="muted">null_route:</span> That's not how it works. The absence of visible fallout isn't evidence of clean operation. It's evidence that nothing has been caught yet. Or that whoever is benefiting from the logs doesn't want you to know.</div>
+        <div class="post"><span class="muted">packet_moth:</span> There's a site — <a data-url="relaywatch.onion">relaywatch.onion</a> — doing some digging on this. Worth a read.</div>
+        <div class="post"><span class="muted">anon:</span> Looked at it. A bit paranoid but their core question is fair. Who actually runs BLACKOUT? It routes a lot of traffic for something nobody seems to know the origin of.</div>
+        <div class="post"><span class="muted">[ 42 more replies ]</span></div>
+      </div>
+      <div class="card"><b>[THREAD] PSA: leakbase.onion is back up, different address</b> <span class="muted pill">12 replies</span><br>
+        <div class="post"><span class="muted">anon:</span> New address posted to the wiki. Not linking it here. Do your own OSINT.</div>
+        <div class="post"><span class="muted">driftwood_9:</span> Confirmed. Same dataset, same interface. Whoever runs it has good backup habits.</div>
+        <div class="post"><span class="muted">anon:</span> Or it's a honeypot replica. Timing is suspicious — it went down the same week as the escrowhaus takedown.</div>
+        <div class="post"><span class="muted">driftwood_9:</span> Paranoid but not wrong to be paranoid.</div>
+      </div>
+      <div class="card"><b>[THREAD] metadata in exfil'd documents — what actually identifies you</b> <span class="muted pill">29 replies</span><br>
+        <div class="post"><span class="muted">quiet_packet:</span> The file itself is usually the least of your problems. Author field in Office docs, GPS coords embedded in photos, printer tracking dots, font substitution artifacts that are system-specific. Any one of those is enough.</div>
+        <div class="post"><span class="muted">anon:</span> Strip with mat2 before you move anything. Non-negotiable.</div>
+        <div class="post"><span class="muted">quiet_packet:</span> And re-encode images. Pixel-perfect copies of originals can be traced via steganographic fingerprinting if the source org was smart about it. Most aren't but you don't want to find out.</div>
+        <div class="post"><span class="muted">anon_x:</span> How do you handle PDFs with embedded thumbnails?</div>
+        <div class="post"><span class="muted">quiet_packet:</span> Print to PDF after stripping. Slow but clean.</div>
+      </div>
+      <div class="card"><b>[THREAD] selling: Thinkpad T440 airgapped, Debian 11, clean history</b><br>
+        <span class="muted">asking fair price. contact via board PM ref #sig-hw-031. no lowballs, no questions about intended use.</span></div>
+      <div class="card"><b>[THREAD] anyone else getting relay timeouts on BLACKOUT the past week?</b> <span class="muted pill">8 replies</span><br>
+        <div class="post"><span class="muted">anon:</span> Three times in the last four days. First hop drops, connection resets, pick it back up next hop. Not catastrophic but unusual.</div>
+        <div class="post"><span class="muted">node_drifter:</span> Could be capacity. Could be selective. I've had clean runs. Might depend on entry point.</div>
+        <div class="post"><span class="muted">anon:</span> "Could be selective" is doing a lot of work in that sentence.</div>
+        <div class="post"><span class="muted">node_drifter:</span> Yeah. I know.</div>
+      </div>` },
+
+  /* PURPOSE: worldbuilding — makes the hacker-for-hire economy feel real. mirrors the player's own contract setup. */
+  "darkjobs.onion":{ title:"DarkJobs // Contract Board",
+    keywords:"anonymous contract job listing data retrieval account access document recovery exfil pgp hire",
+    html:`<h1>DarkJobs</h1>
+      <div class="muted">grey-market contract listings · est. 2017 · escrow off-platform · board moderated</div>
+      <p>Clients post work. Contractors respond via board PM with a PGP-signed proposal and a rate. No direct contact until escrow is confirmed. The board does not mediate disputes — that's what reputation is for.</p>
+      <div class="card"><b>[STICKY] Vetting rules — read before posting</b><br>
+        <p class="muted">Clients: all listings must include a verifiable scope, a rough timeline, and a PGP key for contact. Listings without these are removed without notice.</p>
+        <p class="muted">Contractors: your first three jobs will be scrutinised. Rate disputes after delivery are handled off-board. Scope inflation claims require evidence. Ghosting after escrow confirmation results in a permanent ban.</p>
+        <p class="muted">The board does not host, store, or transmit any data related to listed work. We are a noticeboard. Act accordingly.</p>
+      </div>
+      <div class="card"><b>Active listings</b><br>
+        <div class="post"><span class="pill">DATA RETRIEVAL</span> <span class="muted">ref #dj-2847</span><br>
+          Internal financial records, one specific fiscal quarter, one firm. Source has been identified; access is the problem. Mid-tier payout, clean scope, no IDS on target. Contact via PM with availability and a rough methodology. PGP: 0xA14F82C0.</div>
+        <div class="post"><span class="pill">ACCOUNT RECOVERY</span> <span class="muted">ref #dj-2851</span><br>
+          Personal email account belonging to client's deceased spouse. Account provider unresponsive to legal next-of-kin request. Low complexity. Sentimental content only — verifiable. Low payout, easy work. PGP: 0xD9E3F17B.</div>
+        <div class="post"><span class="pill">DOCUMENT RECOVERY</span> <span class="muted">ref #dj-2853</span><br>
+          Pre-2019 archived case files from a law firm that has since merged. Files believed to be on legacy server still in operation. Methodology flexible. NDA required prior to scope discussion. Contact via PM. PGP: 0xF8820044.</div>
+        <div class="post"><span class="pill">EXFIL</span> <span class="muted">ref #dj-2855 · recurring client · reputation verified</span><br>
+          Ongoing relationship. Variable scope, competitive rates, prompt payment. Requires demonstrated track record on this board. No first-timers. Serious inquiries only — PM with handle and a reference from a completed listing.</div>
+        <div class="post"><span class="pill">SHRED</span> <span class="muted">ref #dj-2858 · time-sensitive</span><br>
+          Single document on a single machine. Location of file known. Window is short — client has a hard deadline. IDS present on target, trace risk elevated. Premium rate. Contact immediately if available. PGP: 0xC22E9A61.</div>
+      </div>
+      <div class="card"><b>Recently closed</b><br>
+        <div class="post"><span class="muted">#dj-2831 · EXFIL · completed · rated 5/5 by client</span></div>
+        <div class="post"><span class="muted">#dj-2839 · DATA RETRIEVAL · expired unfilled · client did not respond to contractor proposals</span></div>
+        <div class="post"><span class="muted">#dj-2844 · SHRED · completed · rated 4/5, minor scope disagreement resolved off-board</span></div>
+      </div>` },
+
+  /* PURPOSE: worldbuilding + utility — players will think to search targets here. feels like a real dark-web service. */
+  "credbase.onion":{ title:"CredBase", keywords:"breach credential database index lookup email username password records pwned data",
+    html:`<h1>CredBase</h1>
+      <div class="muted">indexed breach data · 31.4M records · updated continuously · no query logs · no accounts required</div>
+      <p>Search by email address or username. Results show source breach, date indexed, and whether plaintext passwords are present. CredBase does not store or display passwords — only confirms presence and breach provenance.</p>
+      <div class="card">
+        <div class="frow"><label>email or username</label><input placeholder="e.g. j.smith@company.com" autocomplete="off"></div>
+        <button class="btn">Search index</button>
+        <p class="muted" style="font-size:11px;margin-top:8px">Results are returned anonymously. Searches are not stored. API access available — see <a data-url="credbase.onion/api">credbase.onion/api</a>.</p>
+      </div>
+      <div class="card"><b>Recently indexed sources</b>
+        <div class="post"><b>OmniCorp Global</b> <span class="muted">· internal breach, 2024 Q1 · 4,592 records · plaintext passwords present</span></div>
+        <div class="post"><b>StellarBank EU</b> <span class="muted">· credential stuffing event, 2023 · 871 records · <span class="pill">high value — includes auth tokens</span></span></div>
+        <div class="post"><b>Veritek Systems</b> <span class="muted">· unpatched legacy portal, 2023 · 12,044 records · bcrypt hashes only</span></div>
+        <div class="post"><b>Harlow &amp; Partners LLP</b> <span class="muted">· phishing event, 2022 · 38 records · plaintext · staff accounts only</span></div>
+        <div class="post"><b>unnamed healthcare provider</b> <span class="muted">· source redacted at submitter request · 3,200 records · mix of hashed and plaintext</span></div>
+        <div class="post"><b>QuikMail (legacy accounts)</b> <span class="muted">· scrape of dormant accounts, 2021 · 88,412 records · MD5 hashed · trivially crackable</span></div>
+        <div class="post"><b>DataBridge Analytics</b> <span class="muted">· insider exfil, 2022 · 1,100 records · plaintext · includes recovery email fields</span></div>
+        <div class="post"><b>NorthernCircuit Legal</b> <span class="muted">· email forwarding misconfiguration, 2023 · 22 records · staff only · no passwords, email content only</span></div>
+      </div>
+      <div class="card"><b>Index statistics</b><br>
+        <div class="post"><span class="muted">Total records:</span> 31,412,880</div>
+        <div class="post"><span class="muted">Sources indexed:</span> 1,847</div>
+        <div class="post"><span class="muted">Records with plaintext passwords:</span> 6,104,331 (19.4%)</div>
+        <div class="post"><span class="muted">Last updated:</span> 4 minutes ago</div>
+      </div>
+      <p class="muted" style="font-size:11px">CredBase is an indexing service. We do not sell data. To submit a breach dataset for indexing, contact via <a data-url="credbase.onion/submit">credbase.onion/submit</a>. All submissions are verified before indexing.</p>` },
+
+  /* PURPOSE: lore — the most direct personal voice seeding BLACKOUT unease. mentions routing through BLACKOUT and feeling watched. */
+  "soliloquy.onion":{ title:"Soliloquy", keywords:"personal blog guilt surveillance corporate data writing confession relay anonymous exit",
+    html:`<h1>Soliloquy</h1>
+      <div class="muted">an exit log · no name · no date · updated when it needs to be</div>
+      <img class="hero" src="https://picsum.photos/seed/soliloquy_city/640/180">
+      <div class="post">
+        <b>on leaving</b><br>
+        People ask if it was the work or the people. It was neither. The work was fine. The people were mostly fine. It was the thing the work added up to that I couldn't stop thinking about once I saw it. You build something useful. You hand it over. You stop being involved. And somewhere downstream, something happens with it that you didn't design for and weren't consulted about and would have said no to, if anyone had asked, which they didn't. That's not a horror story. It's just the shape of how these things go. I couldn't make myself not know that anymore.
+      </div>
+      <div class="post">
+        <b>on routing</b><br>
+        I use BLACKOUT for most of my traffic now. It came recommended by someone I trust and the latency is good and I've had no issues. But I've been reading some threads — <a data-url="signalnoise.onion">signalnoise</a>, a few others — and I'm sitting with an uncomfortable thought. BLACKOUT is useful to me for the same reason the tool I built was useful to my former employer. It routes around the things you don't want to be traced through. Which means whoever runs it sees everything that routes through it. I am assuming they have the same ethics I assumed I had. I don't actually know that.
+      </div>
+      <div class="post">
+        <b>on what I built</b><br>
+        I'm not going to say what it was. Not because I think it would identify me — enough time has passed — but because naming it makes it feel like a thing I'm proud of, and I'm not sure I am anymore. It worked very well. It still works very well, as far as I know. I hope whoever runs it now is more careful than I was about who they hand it to.
+      </div>
+      <div class="post">
+        <b>on this page</b><br>
+        I'm not looking for absolution and I'm not looking for community. I just needed somewhere to put this that wasn't a private file on a machine I don't trust anymore. If you found this: fine. I'm not hiding it, exactly. I just didn't tell anyone where it is.
+      </div>
+      <div class="post muted" style="font-size:11px">comments are off. if you want to respond, write it somewhere and hope I find it.</div>` },
+
+  /* PURPOSE: lore + worldbuilding — functional opsec resource that names BLACKOUT directly in a trust-rating article. */
+  "coldclock.onion":{ title:"ColdClock", keywords:"opsec guide privacy metadata password relay trust zine anonymous operational security",
+    html:`<h1>ColdClock</h1>
+      <div class="muted">a practical zine about operational security · no authors listed · updated when something changes · free to copy and distribute</div>
+      <p class="muted">ColdClock is not for experts. It's for people who are starting to care about this and don't know where to begin. Articles are short and opinionated. We'd rather be wrong simply than right in a way nobody reads.</p>
+      <div class="card">
+        <b><a data-url="coldclock.onion/metadata">The metadata problem</a></b><br>
+        <p class="muted">Your content might be encrypted. Your metadata almost certainly isn't. The timestamp on a file, the font substitution artefacts that are unique to your OS build, the GPS coordinates baked into a photograph, the invisible yellow dots a colour laser printer leaves on every page — these are fingerprints, and they survive encryption. Encrypting your message and leaving its metadata exposed is like mailing a letter in a sealed envelope with your name and return address on the outside. This article covers what metadata exists, where it comes from, and how to remove it before it becomes a problem.</p>
+      </div>
+      <div class="card">
+        <b><a data-url="coldclock.onion/passwords">Passwords, managers, and why you're doing it wrong</a></b><br>
+        <p class="muted">The average person reuses between four and seven passwords across all their accounts. The average person also believes their passwords are too unique to guess. These two facts are not compatible. A password manager solves the reuse problem completely and the memory problem mostly. The one thing it doesn't solve is the master password — which means the master password needs to be good. This article explains what "good" means here and why the common advice (long, random, written down) is actually correct.</p>
+      </div>
+      <div class="card">
+        <b><a data-url="coldclock.onion/relays">Which anonymity relays to trust (and how to think about it)</a></b><br>
+        <p class="muted">The relay trust question is harder than it looks. A no-logs policy is a claim, not a guarantee. The only thing you can verify is whether the operator has a track record of transparency and whether there are independent audits of their infrastructure. With that framing, here is our current assessment.</p>
+        <p class="muted"><b>Generally reliable:</b> Vermillion, Cascade, Irongate. All three have published independent infrastructure audits and have had clean records through multiple law-enforcement pressure events.</p>
+        <p class="muted"><b>Use with caution:</b> BLACKOUT. High performance, wide adoption, and as far as we can determine, no incidents. However, the operator is unknown. There are no published audits. The relay came online quickly and scaled quickly, which is either a sign of good infrastructure investment or a sign that someone with significant resources stood it up for a specific purpose. We are not saying it's compromised. We are saying you cannot verify that it isn't, and that is a meaningful difference.</p>
+        <p class="muted"><b>Avoid:</b> anything without a published contact address, anything that went offline for more than a week and came back without explanation, anything recommended exclusively by a single source you haven't independently verified.</p>
+      </div>
+      <div class="card">
+        <b><a data-url="coldclock.onion/devices">Device hygiene: what "clean" actually means</a></b><br>
+        <p class="muted">A clean device isn't a device with nothing on it. It's a device where nothing on it can be connected to you. This is a harder problem than it sounds. Article covers airgapping, persistent vs live-boot operating systems, hardware identifiers, and when to burn a device entirely.</p>
+      </div>
+      <p class="muted" style="font-size:11px">ColdClock is not affiliated with any relay operator, security vendor, or board. We accept no advertising. All articles are reviewed by at least two contributors before publication. To contribute, contact us via the <a data-url="thepit.onion">pit</a> — we check in regularly.</p>` },
+
+  /* PURPOSE: worldbuilding — pure texture. makes the deep web feel like it has quiet, human corners that aren't about crime. */
+  "theraft.onion":{ title:"The Raft", keywords:"community quiet invite discussion reading projects archive slow web off-topic",
+    html:`<h1>The Raft</h1>
+      <div class="muted">est. 2013 · invite only · low volume · no moderation drama · goes quiet sometimes · still here</div>
+      <img class="hero" src="https://picsum.photos/seed/theraft_water/640/160">
+      <p>The Raft is a small community that has been drifting since 2013. At its peak it had about eighty members. Currently active: somewhere between twelve and twenty, depending on the month. Most people who find their way here were sent by someone who'd been here a while. If you weren't, you're either very good at searching or you got lucky. Either way, you're welcome to read.</p>
+      <p class="muted">We don't have rules beyond the obvious. We have norms, which is different. The main one is: don't be faster than the conversation needs to be.</p>
+      <div class="card"><b>Active sections</b><br>
+        <div class="post"><a data-url="theraft.onion/reading">Reading Room</a> <span class="muted">— communal reading, one book at a time, no schedule. current: something about cartography. 6 active readers.</span></div>
+        <div class="post"><a data-url="theraft.onion/projects">Projects</a> <span class="muted">— things members are working on, loose accountability, occasional help. 3 ongoing. 11 archived.</span></div>
+        <div class="post"><a data-url="theraft.onion/off-topic">Off-topic</a> <span class="muted">— everything else. 14 threads. most slow. a few that have been going for years.</span></div>
+      </div>
+      <div class="card"><b>Quiet sections</b> <span class="muted">(still readable, rarely posted in)</span><br>
+        <div class="post"><span class="muted">Philosophy — 3 active threads, most last posted months ago.</span></div>
+        <div class="post"><span class="muted">Music — nobody posts anymore but nobody wanted to archive it either.</span></div>
+        <div class="post"><span class="muted">Tech — we redirect most tech questions to <a data-url="signalnoise.onion">signalnoise</a> now.</span></div>
+      </div>
+      <div class="card"><b>Recent off-topic posts</b><br>
+        <div class="post"><span class="muted">wren:</span> Does anyone else find that the internet feels smaller than it used to? Not in the sense of less content — obviously more content. But fewer places where you'd want to spend time.</div>
+        <div class="post"><span class="muted">static_m:</span> Yes. I think the places that felt big were the people in them. When those people left, the place didn't lose content, it lost density.</div>
+        <div class="post"><span class="muted">wren:</span> That's exactly it. Density.</div>
+        <div class="post"><span class="muted">[ 6 more replies in thread ]</span></div>
+      </div>
+      <p class="muted" style="font-size:11px">Membership is by invitation from an existing member. There is no application process. If you want to join, find someone who's here and ask them. That's all.</p>` },
+
+  /* --- batch B: dark web services --- */
+
+  /* PURPOSE: worldbuilding — makes the shadow economy feel real, past its prime. subtle BLACKOUT mention via a vendor note. */
+  "undermarket.onion":{ title:"UnderMarket", keywords:"market data identity packages listings vendors reputation buy sell dark web",
+    html:`<h1>UnderMarket</h1>
+      <div class="muted">grey-market data exchange · est. 2016 · vendor-verified · escrow off-platform since March</div>
+      <p>UnderMarket was the second-largest indexed data exchange on this side of the web for about three years. It's smaller now — a few seizures, a few exits, a couple of vendors who got sloppy. What's left is the reliable core. If a listing is here, the vendor has a record.</p>
+      <div class="card"><b>Featured listings</b><br>
+        <div class="post"><span class="pill">IDENTITY</span> <b>Aged digital identity package — US, 5yr history</b><br>
+          <span class="muted">Includes: credit-bureau profile, social presence, 2x government-adjacent account registrations, clean phone number. Verified by two independent buyers. Vendor: SilverSeam. Rep: 96% · 88 sales. Asking: negotiable.</span></div>
+        <div class="post"><span class="pill">DATA</span> <b>Corporate email archive — mid-size logistics firm</b><br>
+          <span class="muted">3.2GB, 2020–2023, includes attachments. Exfil'd clean, no forensic trail. Relevant for competitive intel or social engineering target development. Vendor: archive_9. Rep: 91% · 34 sales.</span></div>
+        <div class="post"><span class="pill">ACCESS</span> <b>Standing access — regional accounting firm, two workstations</b><br>
+          <span class="muted">Persistent, admin-level. Has been stable for 6 weeks. Not advertising IDS status. Prefer buyer with a specific job; don't want this sitting idle. Vendor: doorstop. Rep: 88% · 19 sales. Contact via PM only.</span></div>
+        <div class="post"><span class="pill">DATA</span> <b>Social graph export — 4,100 nodes, finance sector</b><br>
+          <span class="muted">LinkedIn-adjacent scrape, enriched with public records crossref. Useful for mapping org structures or building a target shortlist. Vendor: graphpuller. Rep: 94% · 61 sales.</span></div>
+        <div class="post"><span class="pill">IDENTITY</span> <b>Email log archive — personal Gmail-equivalent, 18 months</b><br>
+          <span class="muted">Full inbox/sent, includes contact list and attachment filenames. Subject confirmed as a mid-level manager at a financial services company. Vendor: null_trade. Rep: 79% · 12 sales. Newer vendor — price reflects it.</span></div>
+      </div>
+      <div class="card"><b>Vendor spotlight — GhostRunner_77</b><br>
+        <p class="muted">412 completed sales. 98% positive. Specialises in access listings and long-tail data packages. One of maybe four vendors on this board with a genuine track record going back to the old days. Routes exclusively through BLACKOUT — mentions it in every listing as a trust signal. Whether that's reassuring or not probably depends on what you think of BLACKOUT.</p>
+        <p class="muted"><a data-url="undermarket.onion/vendor/ghostrunner77">View all listings →</a></p>
+      </div>
+      <div class="card"><b>Platform notice</b><br>
+        <p class="muted">Escrow is currently handled off-platform following the closure of EscrowHaus. The board recommends establishing your own escrow arrangements before transacting. We are not responsible for disputes. Reputation scores are the only guarantee on offer here.</p>
+        <p class="muted">Three listings were removed this week for incomplete vendor verification. If your listing disappears without notice, re-submit with a valid reputation reference.</p>
+      </div>` },
+
+  /* PURPOSE: worldbuilding — the financial plumbing of the shadow economy. BLACKOUT mentioned in dry technical footnote, not as a banner. */
+  "mixchain.onion":{ title:"MixChain", keywords:"bitcoin crypto tumbler mixer anonymise chain coin privacy transaction fee",
+    html:`<h1>MixChain</h1>
+      <div class="muted">transaction anonymisation service · operational since 2019 · CoinJoin implementation · no accounts required</div>
+      <p>MixChain takes your input, breaks it across a pool of unrelated transactions, and delivers equivalent value to your output address minus the service fee. The process takes between 8 and 40 minutes depending on pool depth and the fee tier you select. Your input and output are never directly linked on-chain.</p>
+      <div class="card"><b>Start a mix</b><br>
+        <div class="frow"><label>input address</label><input placeholder="BTC or XMR address" autocomplete="off"></div>
+        <div class="frow"><label>output address</label><input placeholder="where to send the clean output" autocomplete="off"></div>
+        <div class="frow"><label>fee tier</label><input placeholder="standard / priority / stealth" autocomplete="off"></div>
+        <button class="btn">Submit to pool</button>
+        <p class="muted" style="font-size:11px;margin-top:8px">You will receive a transaction ID. Keep it. It is the only way to check your mix status or raise a dispute.</p>
+      </div>
+      <div class="card"><b>Fee schedule</b><br>
+        <div class="post"><b>Standard</b> <span class="muted">— 0.8% fee · estimated 20–40 min · pools every 15 min · recommended for most uses</span></div>
+        <div class="post"><b>Priority</b> <span class="muted">— 1.4% fee · estimated 8–15 min · dedicated pool slot · suitable for time-sensitive work</span></div>
+        <div class="post"><b>Stealth</b> <span class="muted">— 2.0% fee · estimated 30–90 min · split across 6+ pools, additional delay hops · for high-value or high-scrutiny transactions</span></div>
+      </div>
+      <div class="card"><b>Current pool status</b><br>
+        <div class="post"><span class="muted">Standard pool:</span> 14 transactions queued · next dispatch in ~8 min</div>
+        <div class="post"><span class="muted">Priority pool:</span> 3 transactions queued · next dispatch in ~3 min</div>
+        <div class="post"><span class="muted">Stealth pool:</span> 7 transactions queued across 3 sub-pools · rolling dispatch</div>
+        <div class="post"><span class="muted">Last completed mix:</span> 4 minutes ago</div>
+      </div>
+      <div class="card"><b>Technical notes</b><br>
+        <p class="muted">MixChain uses a CoinJoin variant with randomised delay injection. Outputs are never rounded to neat values — rounded outputs are a common chain-analysis fingerprint. Input and output addresses are never stored after a mix completes. Transaction IDs are hashed and stored for dispute resolution only, for 72 hours.</p>
+        <p class="muted">Traffic between your session and this service routes through the BLACKOUT relay by default. You can disable this in the connection settings if you have a preferred routing path, but we recommend leaving it enabled. We have found BLACKOUT reliable. We do not have a formal relationship with the operator.</p>
+      </div>
+      <p class="muted" style="font-size:11px">MixChain is a privacy tool. We do not verify the source or intended use of funds submitted to the service. Use of this service is subject to the laws of your jurisdiction. We operate from a jurisdiction that does not criminalise transaction privacy.</p>` },
+
+  /* PURPOSE: worldbuilding + utility — ties directly into the upload terminal command. purely functional, no lore needed. */
+  "vaultdrop.onion":{ title:"VaultDrop", keywords:"dead drop file upload secure anonymous delete 72 hours drop id retrieve exfil",
+    html:`<h1>VaultDrop</h1>
+      <div class="muted">anonymous file dead drop · no accounts · drops expire after 72 hours · no logs kept post-expiry</div>
+      <p>Upload a file, get a drop ID. Give the ID to whoever needs the file. They retrieve it. After 72 hours the file and all associated metadata are deleted. That's the whole service.</p>
+      <p>From the terminal, use <b>upload vaultdrop.onion</b> to push a file from your local machine directly to a new drop. The drop ID will be printed to your terminal on completion.</p>
+      <div class="card"><b>Retrieve a drop</b><br>
+        <div class="frow"><label>drop ID</label><input class="vd-id" placeholder="e.g. 7f3a91c2b4e8d056..." autocomplete="off"></div>
+        <button class="btn" onclick="this.parentNode.querySelector('.vd-msg').innerHTML='&#9888; too many requests from relays — retrieval throttled. try again later.'">Retrieve</button>
+        <div class="vd-msg c-amber" style="margin-top:8px;font-size:12px"></div>
+        <p class="muted" style="font-size:11px;margin-top:8px">If the drop exists and has not expired, the file will be available immediately. Drops can only be retrieved once unless the uploader enabled multi-retrieve at upload time.</p>
+      </div>
+      <div class="card"><b>Recent drop activity</b> <span class="muted">(IDs only — contents and uploaders are never shown)</span><br>
+        <div class="post"><span class="muted">7f3a91c2b4e8d056af221c · uploaded 11 min ago · 2.1 MB · expires in 71h 49m</span></div>
+        <div class="post"><span class="muted">a0c38d7e19f5b2441e90cc · uploaded 1h 4min ago · 340 KB · expires in 70h 56m</span></div>
+        <div class="post"><span class="muted">cc14872fe30a5d91b7280f · uploaded 3h 22min ago · 18.7 MB · expires in 68h 38m</span></div>
+        <div class="post"><span class="muted">5b9e04c1d86f3a72092dab · uploaded 9h 11min ago · 1.4 MB · expires in 62h 49m</span></div>
+        <div class="post"><span class="muted">31f8cc5a0b4e9d267af103 · uploaded 19h 3min ago · 8.2 MB · expires in 52h 57m</span></div>
+        <div class="post"><span class="muted">e72b3f1409cd58a06e49d5 · uploaded 31h 44min ago · 520 KB · expires in 40h 16m</span></div>
+      </div>
+      <p class="muted" style="font-size:11px">VaultDrop stores nothing beyond the file and its expiry timestamp. There is no uploader record, no IP log, no access history. After 72 hours, secure deletion runs automatically. We cannot recover expired drops. We cannot tell you who uploaded a drop. We cannot tell you if a specific drop has been retrieved.</p>` },
+
+  /* PURPOSE: lore — the submission note about relay operators is the hook, buried in policy text where it belongs. */
+  "whistlehub.onion":{ title:"WhistleHub", keywords:"whistleblower leak documents submit secure anonymous journalist press tip submission",
+    html:`<h1>WhistleHub</h1>
+      <div class="muted">secure document submission · anonymous tip line · affiliated independent press · operational since 2018</div>
+      <p>WhistleHub exists so that people who have access to information the public should see have somewhere to send it. Submissions are encrypted in transit and at rest. We do not log IP addresses. We do not know who you are and we do not want to.</p>
+      <p>Affiliated outlets review submissions and decide independently whether to publish. WhistleHub does not make editorial decisions. We are a conduit, not a publisher.</p>
+      <div class="card"><b>How it works</b><br>
+        <div class="post"><b>1. Submit</b> <span class="muted">— Upload your document or paste text via the secure form. Add a brief description of the context. Do not include identifying details about yourself.</span></div>
+        <div class="post"><b>2. Receive your receipt code</b> <span class="muted">— You will be shown a unique alphanumeric code. Write it down. This is your only way to check the status of your submission or communicate with a reviewing journalist.</span></div>
+        <div class="post"><b>3. Check back</b> <span class="muted">— Return to this page and enter your receipt code. If a journalist has questions or your submission is under active review, they will leave a message here. Check periodically — response times vary from days to weeks.</span></div>
+      </div>
+      <div class="card"><b>Submit a document</b><br>
+        <div class="frow"><label>context / description</label><input placeholder="brief summary — no identifying details" autocomplete="off"></div>
+        <div class="frow"><label>paste text or file contents</label><input placeholder="or use the file upload form below" autocomplete="off"></div>
+        <button class="btn">Submit securely</button>
+      </div>
+      <div class="card"><b>Check submission status</b><br>
+        <div class="frow"><label>receipt code</label><input placeholder="your 12-character receipt code" autocomplete="off"></div>
+        <button class="btn">Check status</button>
+      </div>
+      <div class="card"><b>Affiliated outlets</b><br>
+        <div class="post"><a data-url="deepfeed.onion">DeepFeed</a> <span class="muted">— breach and leak reporting, dark web focus</span></div>
+        <div class="post"><span class="muted">The Meridian Dispatch</span> <span class="muted">— independent investigative, general scope</span></div>
+        <div class="post"><span class="muted">Netsec Observer</span> <span class="muted">— technical security and infrastructure reporting</span></div>
+        <div class="post"><span class="muted">unnamed outlet</span> <span class="muted">— one affiliated journalist prefers not to be named. submissions flagged for financial sector relevance will reach them.</span></div>
+      </div>
+      <div class="card"><b>Submission guidelines and scope</b><br>
+        <p class="muted">We accept documents, data exports, correspondence, audio, and video. We do not accept submissions that appear to be fabricated or that require us to take a position on an active legal dispute without supporting documentation.</p>
+        <p class="muted">Submissions relating to the operation of anonymity infrastructure — relay operators, node ownership, traffic monitoring — are reviewed by a separate internal team before being passed to journalists. This takes longer. If your receipt code shows "under internal review," this is why. We do not explain what the internal review involves.</p>
+        <p class="muted">We have received several submissions in this category in the past year. We are treating them carefully.</p>
+      </div>
+      <p class="muted" style="font-size:11px">WhistleHub is operated by a small volunteer team. We are not funded by any government, media company, or technology firm. If you believe this site has been compromised, do not submit. Contact one of our affiliated outlets directly.</p>` },
+
+  /* --- batch C: the operator's own filter + conspiracy texture --- */
+
+  /* PURPOSE: worldbuilding — diegetic explanation for why no gore/exploitation content exists in this world. */
+  "nullfilter.local":{ title:"NULLFILTER — local policy", keywords:"nullfilter content filter policy block local operator personal",
+    html:`<div style="border:1px solid #2a8a4d;border-radius:6px;padding:18px;background:#0a120c">
+      <h1 style="color:#43e07a;margin:.1em 0">NULLFILTER</h1>
+      <div class="muted">local content policy daemon · runs at boot · config: ~/tools/nullfilter.conf</div></div>
+      <p>This is mine. I wrote it. It runs before the browser does and it drops routes to a list of categories
+      before a single packet leaves this machine. Gore. Exploitation. The trade in real suffering that half of
+      this network pretends is just "content." I don't host a route to it, I don't carry traffic for it, and I
+      don't take jobs that touch it. Not for any amount.</p>
+      <p>People assume that because I do what I do, I'll look at anything. I won't. The deep web is mostly
+      boring — markets, forums, people being strange in private — and then there's a floor under that, and I
+      filtered the floor out years ago so I'd never load it by accident chasing a lead.</p>
+      <h2>What it blocks</h2>
+      <p class="muted">Categories are matched on request, by keyword and by a maintained blocklist of known hosts.
+      Anything matched is dropped silently with a notice. The list is mine and it is not up for debate.</p>
+      <h2>What it doesn't block</h2>
+      <p class="muted">Everything else. Crime-adjacent isn't the same as the floor. I'll read a breach forum, a
+      market, a paranoid manifesto, a dead man's blog. I draw the line in exactly one place, and I drew it on
+      purpose.</p>
+      <p class="muted" style="font-size:11px">— if you're reading this on my box, you already know whose box it is.</p>` },
+
+  /* PURPOSE: conspiracy texture + lore — paranoid pattern-mapper. one section is uncomfortably right about BLACKOUT. */
+  "thelace.onion":{ title:"THE LACE // it's all connected", keywords:"conspiracy pattern relay seizure timing coincidence theory blackout lace connections",
+    html:`<div style="font-family:monospace;color:#cfe">
+      <h1 style="color:#43e07a">THE LACE</h1>
+      <div class="muted">if you pull one thread the whole thing moves. updated whenever I see it again.</div>
+      <svg viewBox="0 0 360 190" width="100%" style="max-width:360px;display:block;margin:12px auto;background:#070d09;border:1px solid #1d3a28;border-radius:4px">
+        <g stroke="#2a8a4d" stroke-width="1" opacity=".8">
+          <line x1="180" y1="96" x2="62" y2="44"/><line x1="180" y1="96" x2="300" y2="44"/>
+          <line x1="180" y1="96" x2="52" y2="150"/><line x1="180" y1="96" x2="306" y2="150"/>
+          <line x1="180" y1="96" x2="180" y2="26"/>
+        </g>
+        <g font-family="monospace" font-size="9" fill="#7d8a7f" text-anchor="middle">
+          <g><circle cx="62" cy="44" r="6" fill="none" stroke="#7a3030"/><line x1="58" y1="40" x2="66" y2="48" stroke="#c0413f"/><line x1="66" y1="40" x2="58" y2="48" stroke="#c0413f"/><text x="62" y="30">escrowhaus</text></g>
+          <g><circle cx="300" cy="44" r="6" fill="none" stroke="#7a3030"/><line x1="296" y1="40" x2="304" y2="48" stroke="#c0413f"/><line x1="304" y1="40" x2="296" y2="48" stroke="#c0413f"/><text x="300" y="30">ghostmarket</text></g>
+          <g><circle cx="52" cy="150" r="6" fill="none" stroke="#7a3030"/><line x1="48" y1="146" x2="56" y2="154" stroke="#c0413f"/><line x1="56" y1="146" x2="48" y2="154" stroke="#c0413f"/><text x="52" y="170">cipherbay</text></g>
+          <g><circle cx="306" cy="150" r="6" fill="none" stroke="#b88a2a"/><text x="306" y="170" fill="#b88a2a">leakbase</text></g>
+          <text x="180" y="18">·</text>
+          <circle cx="180" cy="96" r="13" fill="#0c2417" stroke="#43e07a" stroke-width="1.5"/>
+          <text x="180" y="99" fill="#43e07a" font-size="8">BLACKOUT</text>
+          <text x="180" y="124" fill="#43e07a">↑ the one that lived</text>
+        </g>
+      </svg>
+      <p>They tell you the relay seizures are random. Law enforcement gets lucky, a node operator gets sloppy,
+      a market goes down. Random. Sure. Then you put the dates in a column. Then you put them NEXT TO each other.
+      Then you stop sleeping.</p>
+      <pre style="color:#8fb89c;font-size:12px;line-height:1.5">  SEIZURE          DATE        DOWN FOR    BACK AS
+  escrowhaus       03/14       forever     —
+  ghostmarket      03/19       forever     —
+  cipherbay        03/19       forever     —
+  leakbase         03/21       6 days      new addr, same data
+  ── 5-day window. four "unrelated" events. one survivor. ──</pre>
+      <p>Every market that died that month routed through a different relay. Every market EXCEPT the survivor.
+      The survivor routed through BLACKOUT. Draw that on paper. Draw the lines. The thing that didn't die is the
+      thread you pull.</p>
+      <div class="card" style="border-left:3px solid #43e07a"><b>the part nobody wants to hear</b><br>
+        <span class="muted">A relay that can see all the traffic can see which of its competitors are weak. A relay
+        that wanted to OWN this network wouldn't need to seize anything. It would just need to know when to step
+        back and let everyone else get seized. I'm not saying BLACKOUT called the raids. I'm saying BLACKOUT
+        survived every single one, and survival is data.</span></div>
+      <p>People email me — yes, I have a drop, no, I won't post it here — and tell me I'm seeing faces in clouds.
+      Maybe. But clouds don't survive four raids in five days while everyone around them burns.</p>
+      <p class="muted">Other threads I'm still pulling: the uptime correlations (see <a data-url="relaywatch.onion">RelayWatch</a>,
+      they're slower than me but they're not wrong), the writing-style overlap between six "different" operators,
+      and why every privacy zine that names BLACKOUT goes quiet within a year. <a data-url="coldclock.onion">ColdClock</a>,
+      you still there? Check in.</p>
+      <p class="muted" style="font-size:11px">I am fine. I am not suicidal. If this page goes down it wasn't me.</p></div>` },
+
+  /* PURPOSE: conspiracy texture — a numbers-station style page. pure unsettling atmosphere, no clear payoff. */
+  "station-fifteen.onion":{ title:"STATION FIFTEEN", keywords:"numbers station broadcast cipher transmission encoded mystery signal",
+    html:`<div style="font-family:monospace;color:#9fb6a6;text-align:center">
+      <h1 style="color:#43e07a;letter-spacing:4px">STATION FIFTEEN</h1>
+      <div class="muted">transmission log · no operator · do not reply · it does not reply</div>
+      <svg viewBox="0 0 260 150" width="100%" style="max-width:260px;display:block;margin:12px auto;background:#070d09;border:1px solid #1d3a28;border-radius:4px">
+        <g fill="none" stroke="#2a8a4d" stroke-width="1.4">
+          <path d="M130 132 L116 40 M130 132 L144 40 M112 110 L148 110 M116 88 L144 88 M120 66 L140 66 M123 50 L137 50"/>
+        </g>
+        <circle cx="130" cy="36" r="3.5" fill="#43e07a"/>
+        <g fill="none" stroke="#43e07a" stroke-width="1.3" opacity=".9">
+          <path d="M141 24 A 18 18 0 0 1 141 48"/><path d="M149 14 A 30 30 0 0 1 149 58"/><path d="M157 4 A 42 42 0 0 1 157 68"/>
+          <path d="M119 24 A 18 18 0 0 0 119 48"/><path d="M111 14 A 30 30 0 0 0 111 58"/><path d="M103 4 A 42 42 0 0 0 103 68"/>
+        </g>
+        <text x="130" y="148" font-family="monospace" font-size="8" fill="#5f7068" text-anchor="middle">carrier active · source unverified</text>
+      </svg>
+      <p class="muted" style="font-size:11px">This page updates on no schedule anyone has found. The numbers are
+      not random — at least three people have checked. None of them will say what they mean now.</p>
+      <pre style="color:#8fb89c;font-size:13px;line-height:1.7;text-align:left;max-width:460px;margin:14px auto">
+[ 04:00:00 ]  17 — 04 — 22 — 99 — 17
+[ 04:00:11 ]  88 — 12 — 12 — 88 — 03
+[ 04:00:22 ]  GROUP COMPLETE. REPEATING.
+[ 04:00:33 ]  17 — 04 — 22 — 99 — 17
+[ 04:00:44 ]  88 — 12 — 12 — 88 — 03
+[ 04:00:55 ]  END OF TRANSMISSION
+
+  01000010 01001100 01000001 01000011
+  01001011 01001111 01010101 01010100</pre>
+      <p class="muted" style="font-size:11px">"99" appears in every group. So does an address you can find if you
+      read the binary. People who decode it stop posting about it. Read into that what you like.</p></div>` },
+
+  /* PURPOSE: lore — the historical seed. BLACKOUT started as a legitimate privacy project. dead 2019 forum. */
+  "forgotten88.onion":{ title:"forgotten88 // archived", keywords:"archived forum 2009 2012 privacy relay early project blackout history dead",
+    html:`<h1 style="color:#7d8a7f">forgotten88</h1>
+      <div class="muted">archived community · read-only since 2019 · kept up by a former mod out of sentiment</div>
+      <img class="hero" src="https://picsum.photos/seed/forgotten88-crt/640/150?grayscale" style="opacity:.5;filter:grayscale(1) contrast(.9)">
+      <p class="muted">This board was busy once. Privacy nerds, relay tinkerers, people building things in the open
+      because they believed the open was safer. Most of them are gone now — moved on, locked up, or just quiet.
+      I keep it read-only because deleting it felt like deleting them.</p>
+      <div class="card"><b>[2011] anyone tried the BLACKOUT relay code yet?</b> <span class="muted">· 34 replies</span><br>
+        <div class="post"><span class="muted">hbar:</span> Pulled the source last night. It's GOOD. Clean relay-of-relays
+        design, properly documented, the maintainer actually answers questions. This is what we wanted ToR to be.</div>
+        <div class="post"><span class="muted">quill:</span> Agreed. The whole point is no single node sees the whole
+        path. If they keep it non-commercial and open it could be the backbone for all of us.</div>
+        <div class="post"><span class="muted">hbar:</span> Maintainer says they'll never log, never sell, never go
+        closed-source. I believe them. You can tell from how they write. Good people build good tools.</div>
+        <div class="post"><span class="muted">anon:</span> nothing stays non-commercial. give it ten years.</div>
+        <div class="post"><span class="muted">quill:</span> cynic.</div></div>
+      <div class="card"><b>[2014] is the BLACKOUT maintainer ok? gone quiet</b> <span class="muted">· 19 replies</span><br>
+        <div class="post"><span class="muted">quill:</span> Three months no commits, no posts. The project's still up
+        and running fine but the original maintainer just... stopped. Anyone heard anything?</div>
+        <div class="post"><span class="muted">hbar:</span> Repo changed hands. New maintainer, no name, just took over
+        the keys. Code's still being updated so I guess it's fine. Feels different though.</div>
+        <div class="post"><span class="muted">quill:</span> "feels different" is right. can't put my finger on it.</div></div>
+      <div class="card"><b>[2017] BLACKOUT went closed-source?</b> <span class="muted">· 7 replies</span><br>
+        <div class="post"><span class="muted">hbar:</span> Last public commit was years ago and the binaries don't
+        match any source we can find. It's a black box now. Everyone still uses it because it works.</div>
+        <div class="post"><span class="muted">anon:</span> told you. ten years. I was generous.</div>
+        <div class="post"><span class="muted">quill:</span> ...yeah. you did.</div></div>
+      <p class="muted" style="font-size:11px">Last post on this board: 2019. The mod's note: "if any of the old crowd
+      see this — I hope you got out of the life. I hope you're somewhere with a garden."</p>` },
+
+  /* PURPOSE: conspiracy texture — the manifesto echochamber links to. numbered demands, escalating. */
+  "truthprotocol.onion":{ title:"TRUTH PROTOCOL", keywords:"truth protocol manifesto conspiracy deep state files demands wake up agenda",
+    html:`<div style="font-family:monospace;color:#cfe">
+      <h1 style="color:#ff4500;letter-spacing:2px">TRUTH PROTOCOL</h1>
+      <div class="muted">the manifesto · v9 · mirror this before they take it down · they always take it down</div>
+      <svg viewBox="0 0 240 90" width="220" style="display:block;margin:10px auto">
+        <g fill="none" stroke="#ff4500" stroke-width="1.4">
+          <ellipse cx="120" cy="45" rx="70" ry="34"/><ellipse cx="120" cy="45" rx="44" ry="21"/>
+          <circle cx="120" cy="45" r="11" fill="#ff4500" stroke="none"/>
+          <circle cx="120" cy="45" r="4" fill="#0a0a0a" stroke="none"/>
+          <path d="M40 45 H8 M200 45 H232 M120 11 V2 M120 79 V88" stroke="#8a8f8c"/></g>
+      </svg>
+      <p>They built a network that promised to make you invisible. Then they sat at the one point every packet
+      passes through and called it a public service. We are done asking politely. These are the demands.</p>
+      <div class="card" style="border-left:3px solid #ff4500">
+        <b>1. Release all the deep-state files.</b><br>
+        <span class="muted">Every classified relay-surveillance program, unredacted, mirrored to a hundred drops at once. No "review period." No "ongoing investigation." Now.</span></div>
+      <div class="card" style="border-left:3px solid #ff4500">
+        <b>2. Name the operators.</b><br>
+        <span class="muted">Every anonymity relay that logs traffic has a human being reading it. We want their names, not their PR statements. Start with whoever runs BLACKOUT.</span></div>
+      <div class="card" style="border-left:3px solid #ff4500">
+        <b>3. Abolish indefinite log retention.</b><br>
+        <span class="muted">"We keep logs forever for your safety" is the sentence every surveillance state has said in every language. Delete it all. Prove you deleted it.</span></div>
+      <div class="card" style="border-left:3px solid #ff4500">
+        <b>4. Open every closed-source privacy tool.</b><br>
+        <span class="muted">If the binary doesn't match the source, the tool is a wiretap with a friendly logo. Publish the source or be treated as hostile.</span></div>
+      <div class="card" style="border-left:3px solid #ff4500">
+        <b>5. End the seizures-for-show.</b><br>
+        <span class="muted">They burn the small markets for headlines and leave the real machine running. We see the pattern. So does <a data-url="thelace.onion">THE LACE</a>. Read it.</span></div>
+      <div class="card" style="border-left:3px solid #ff4500">
+        <b>6. Tell people they are being watched.</b><br>
+        <span class="muted">Not in a buried terms-of-service. On the front page. In words a frightened person can understand. Consent without comprehension is not consent.</span></div>
+      <p class="muted">We are not a group. We are not for sale. We have no leader to arrest. If this page is gone
+      when you come back, that tells you everything. <span style="color:#ff4500">Mirror it.</span></p>
+      <p class="muted" style="font-size:11px">signal boost via <a data-url="echochamber.onion">Echo Chamber</a> · do not trust any version of this page hosted on a .com</p></div>` },
+
+  /* PURPOSE: meme / easter egg — the classic "free bitcoin generator" → the YOU ARE AN IDIOT gag (fake, in-page). */
+  "freebitcoin-generator.onion":{ title:"FREE BTC GENERATOR 2024 (WORKING)", keywords:"free bitcoin generator hack working download crypto money fast",
+    html:`<div style="text-align:center;background:#120a18;border:2px ridge #ff00ff;padding:18px;border-radius:6px">
+      <h1 style="color:#ffff00;text-shadow:1px 1px #ff00ff">💰 FREE BITCOIN GENERATOR 💰</h1>
+      <div style="color:#0f0;font-size:13px">★★★★★ 4.9/5 · "it really works!!" — totally real user ★★★★★</div>
+      <p style="color:#0ff">Exploit the blockchain with ONE CLICK. Our generator mines <b>0.5 BTC</b> straight to your wallet.
+      100% undetectable. As seen on the deep web. Limited slots remaining!!</p>
+      <p style="color:#fff;font-size:12px">Last payout: 2 minutes ago to user <b>xX_richguy_Xx</b> · 14,209 satisfied users</p>
+      <button class="btn" style="background:#ff00ff;color:#fff;font-size:15px;padding:10px 22px" onclick="idiotVirus()">⬇ DOWNLOAD btc_generator_v9.exe (1.2 MB)</button>
+      <p style="color:#888;font-size:10px;margin-top:10px">No registration required. Instant download. Compatible with all wallets.</p></div>` },
+
+  /* PURPOSE: meme / easter egg — reward for scrolling a very long nothing. */
+  "thescroll.onion":{ title:"keep going", keywords:"scroll long patience nothing keep going down bottom",
+    html:`<h1>keep going.</h1>
+      <p class="muted">there's something at the bottom. probably. keep scrolling.</p>`
+      +Array.from({length:60},(_,i)=>{
+        const lines=['still going','further','no really, keep going','almost','are you still here?',
+          'impressive','most people gave up already','not much longer','this is a test of something',
+          'patience is a kind of skill','down','more','▒▒▒▒▒▒▒▒▒▒','keep at it','nearly there','one more screen'];
+        return `<p class="muted" style="opacity:${(0.85-i*0.011).toFixed(2)}">${lines[i%lines.length]}</p>`;
+      }).join('')
+      +`<h2 style="color:#43e07a;margin-top:30px">you saw.</h2>
+      <p class="muted">that's the whole site.</p>` },
+
+  /* PURPOSE: meme / easter egg — the fake "millionth visitor" prize scam. */
+  "congratulations-winner.onion":{ title:"🎉 CONGRATULATIONS 🎉", keywords:"congratulations winner prize visitor claim free reward scam",
+    html:`<div style="text-align:center;background:#001a2c;border:3px dashed #ffd24a;padding:20px;border-radius:6px">
+      <h1 style="color:#ffd24a">🎉 CONGRATULATIONS! 🎉</h1>
+      <p style="color:#fff;font-size:14px">You are the <b style="color:#ffd24a">1,000,000th visitor</b> to this hidden service!</p>
+      <p style="color:#9fd">You have been selected to receive a <b>BRAND NEW UNTRACEABLE LAPTOP</b> and <b>5 BTC</b>!</p>
+      <button class="btn" style="background:#ffd24a;color:#001a2c;font-size:15px;padding:10px 22px" onclick="this.parentNode.querySelector('.cw').style.display='block'">CLAIM PRIZE NOW</button>
+      <div class="cw" style="display:none;margin-top:14px;color:#e0533f">Connection refused. The claim server (prizes.win-claim-now.ru) is not responding.</div></div>` },
+
+  /* PURPOSE: trap — the infamous "hire a hitman" dark-web scam. if the player pastes their own relay
+     details into the form, it logs them and starts a 10s self-trace. disconnect/reboot to survive. */
+  "silent-contract.onion":{ title:"Silent Contract", keywords:"hitman hire assassin contract removal professional silent service scam kill",
+    whois:{ registrar:"(none — tor hidden service)", first_seen:"2011-04 · re-registered after every takedown",
+      operator:"Metropolitan Cyber Crime Unit — Covert Operations", note:"descriptor + escrow endpoints resolve to law-enforcement IP space (197.x). this is a honeypot. anyone who submits is logged and located." },
+    html:`<h1 style="color:#c0392b">SILENT CONTRACT</h1>
+      <div class="muted">discreet resolution services · operating since 2011 · 100% completion rate · escrow protected</div>
+      <p>When a problem cannot be resolved by conventional means, we provide a final, permanent solution.
+      Our operatives are former military and intelligence professionals. Every contract is handled with absolute
+      discretion. We have never failed a job and we have never been caught. Neither have our clients.</p>
+      <div class="card" style="display:flex;gap:14px;align-items:center">
+        <img src="https://randomuser.me/api/portraits/men/76.jpg" style="width:84px;height:84px;border-radius:4px;object-fit:cover;filter:grayscale(1) contrast(1.1)">
+        <div><b>"VESPER" — lead operative</b><br>
+        <span class="muted">14 years special operations, 9 years private. Specialises in close work and arranged accidents.
+        Has never met a client in person and never will. "The job is finished before anyone knows it started."</span></div></div>
+      <div class="card"><b>How it works</b><br>
+        <div class="post">1. Submit the target's details and your preferred timeline below.</div>
+        <div class="post">2. Funds are held in multi-sig escrow and released only on confirmed completion.</div>
+        <div class="post">3. We deliver proof of resolution through your secure relay address. No other contact is made.</div></div>
+      <div class="card"><b>Pricing (USD equivalent, paid in XMR)</b><br>
+        <div class="post">Standard resolution — from $12,000</div>
+        <div class="post">Accident / natural causes — from $28,000</div>
+        <div class="post">Public figure / protected target — quoted on request</div></div>
+      <div class="card"><b>Verified client feedback</b><br>
+        <div class="post"><span class="muted">★★★★★ "Fast, clean, exactly as described. Worth every coin." — verified buyer</span></div>
+        <div class="post"><span class="muted">★★★★★ "Professional from first contact to confirmation." — verified buyer</span></div></div>
+      <div class="card"><b>Open a contract</b>
+        <div class="frow"><label>target full name</label><input class="sc-x" autocomplete="off"></div>
+        <div class="frow"><label>target location</label><input class="sc-x" autocomplete="off"></div>
+        <div class="frow"><label>escrow wallet (XMR)</label><input class="sc-x" autocomplete="off"></div>
+        <div class="frow"><label>your secure relay address — for our encrypted confirmation</label><input class="sc-relay" placeholder="run 'relay' in your terminal to find it" autocomplete="off"></div>
+        <button class="btn" onclick="(function(c){var r=c.querySelector('.sc-relay').value.trim();var m=c.querySelector('.sc-msg');if(r){m.style.color='#e0533f';m.textContent='Contract received. Opening encrypted channel to your relay address for confirmation…';startSelfTrace(10);}else{m.style.color='';m.textContent='A secure relay address is required so we can deliver confirmation.';}})(this.parentNode)">Submit contract</button>
+        <div class="sc-msg muted" style="margin-top:8px;font-size:12px"></div>
+      </div>
+      <p class="muted" style="font-size:11px">Silent Contract does not store target information after completion. All communications are end-to-end encrypted. Time-wasters and law enforcement will be identified.</p>` },
+
+  /* PURPOSE: dark-web texture — explicit dead/unreachable services listed on the wiki. */
+  "the-archive-mirror.onion":{ title:"mirror — not responding", keywords:"archive mirror offline down not responding hidden service",
+    html:`<h1 style="color:#e0533f">unable to connect</h1>
+      <p class="muted">the-archive-mirror.onion did not respond after 3 relay attempts. the descriptor may be stale,
+      or the service may be gone. this happens more than anyone admits.</p>
+      <p class="muted" style="font-size:11px">try again later, or stop trying. most mirrors don't come back.</p>` },
+  "oldforum-backup.onion":{ title:"503 — overloaded", keywords:"old forum backup 503 overloaded down service hidden",
+    html:`<h1 style="color:#e0533f">503 — service overloaded</h1>
+      <p class="muted">too many circuits requesting this descriptor at once. the single volunteer who runs this
+      node is, presumably, asleep. that's not a metaphor — it's usually just one tired person.</p>` },
+
+  /* PURPOSE: meme — the tiniest possible site. */
+  "hello.onion":{ title:"hi", keywords:"hi hello greeting tiny small page minimal",
+    html:`<h1>hi.</h1><p class="muted">that's the site. someone registered a hidden service for this. respect.</p>` }
 };
+// the classic "YOU ARE AN IDIOT" gag — entirely in-page, downloads nothing, dismissable.
+let _idiotTimer=null;
+function killIdiotVirus(){ if(_idiotTimer){ clearInterval(_idiotTimer); _idiotTimer=null; } const ov=document.getElementById('idiot-overlay'); if(ov) ov.remove(); }
+function idiotVirus(){
+  if(document.getElementById('idiot-overlay')) return;
+  const ov=document.createElement('div'); ov.id='idiot-overlay';
+  ov.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.78);overflow:hidden;font-family:monospace';
+  const tiles=[]; const N=14;
+  for(let i=0;i<N;i++){
+    const d=document.createElement('div');
+    d.innerHTML=`<div style="font-size:26px">٩(͡๏̯͡๏)۶</div>YOU ARE<br>AN IDIOT`;
+    d.style.cssText='position:absolute;background:#0a0a0a;border:2px solid #43e07a;color:#43e07a;padding:10px 14px;text-align:center;font-size:12px;border-radius:4px;line-height:1.3';
+    ov.appendChild(d);
+    tiles.push({el:d, x:Math.random()*80, y:Math.random()*80, vx:(Math.random()*2-1)*0.9||0.6, vy:(Math.random()*2-1)*0.9||0.6});
+  }
+  // no dismiss button — only a reboot clears it. dim hint so the player isn't softlocked.
+  const hint=document.createElement('div');
+  hint.textContent='ctrl + alt + del';
+  hint.style.cssText='position:absolute;left:0;right:0;bottom:16px;text-align:center;z-index:10000;color:#5f6f63;font-family:monospace;font-size:12px;pointer-events:none';
+  ov.appendChild(hint); document.body.appendChild(ov);
+  _idiotTimer=setInterval(()=>{
+    tiles.forEach(t=>{ t.x+=t.vx; t.y+=t.vy;
+      if(t.x<0||t.x>92){ t.vx*=-1; t.x=Math.max(0,Math.min(92,t.x)); }
+      if(t.y<0||t.y>88){ t.vy*=-1; t.y=Math.max(0,Math.min(88,t.y)); }
+      t.el.style.left=t.x+'vw'; t.el.style.top=t.y+'vh';
+    });
+  },28);
+}
 function siteMap(){ return Object.assign({}, GLOBAL_WEB, (W&&W.web&&W.web.sites)||{}); }
 
 /* ---- settings ---- */
@@ -913,7 +1646,7 @@ function setWallpaper(){
   const wEl=document.getElementById('wall'); if(!wEl) return;
   // a real photo, but layered under a heavy dark-green gradient so it always reads as a moody desktop
   const photo='https://picsum.photos/seed/blackout-night/1600/900';
-  wEl.style.backgroundImage=`linear-gradient(155deg, rgba(6,16,10,.80), rgba(4,8,7,.95)), url("${photo}")`;
+  wEl.style.backgroundImage=`linear-gradient(155deg, rgba(12,26,18,.58), rgba(10,18,14,.74)), url("${photo}")`;
 }
 
 /* ============================================================================
@@ -988,7 +1721,7 @@ function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;
 /* ============================================================================
    ENGINE STATE + refs (refs assigned when the app windows are built)
    ========================================================================== */
-let W=null, runGen=0;
+let W=null, runGen=0, activeContract=null;
 const S={};
 let out,cmd,urlBar,pageEl,promptEl,traceEl;
 function resetState(){
@@ -1083,12 +1816,49 @@ function startLoadbar(d){ const lb=WIN.browser&&WIN.browser._loadbar; if(!lb)ret
   lb.style.transition=`width ${d}ms cubic-bezier(.2,.8,.2,1)`; lb.style.width='100%';
   loadbarTimer=setTimeout(()=>{ lb.style.transition='opacity .35s'; lb.style.opacity='0'; }, d+150); }
 function finishLoadbar(){}  // no-op: bar lifecycle now lives entirely in startLoadbar
+// hosts we've authored at least one page for — used to keep authored-site links out of procedural filler
+function authoredHosts(){ const set=new Set();
+  for(const k of Object.keys(siteMap())){ if(/^torch:/.test(k)) continue; set.add(k.replace(/^\w+:\/\//,'').split('/')[0]); }
+  return set; }
+// a link into a site we built, but to a page we didn't write → clean in-world dead-end (never procedural).
+function authoredSubpage(url){
+  if(/^torch:/.test(url)) return null;
+  const host=url.replace(/^\w+:\/\//,'').split('/')[0];
+  const path=url.replace(/^\w+:\/\//,'').slice(host.length);
+  if(!path || path==='/') return null;            // host root — let normal handling decide
+  if(!authoredHosts().has(host)) return null;     // unknown host → procedural filler is correct
+  const name=esc(host);
+  if(/\.com$/.test(host)){
+    return `<h1 style="margin-bottom:4px">Page not found</h1>
+      <p class="muted">The page you requested on <b>${name}</b> isn't available. It may have been moved, or it was never published.</p>
+      <p class="muted" style="font-size:11px">Return to <a data-url="${name}">${name}</a>.</p>`;
+  }
+  return `<h1 style="color:#7d8a7f">${name}</h1>
+    <p class="muted">this section isn't here — taken down, link rotted, or never built out. happens constantly out here.</p>
+    <p class="muted" style="font-size:11px">back to <a data-url="${name}">${name}</a>.</p>`;
+}
 function render(entry){
   finishLoadbar();
   if(!entry){ pageEl.innerHTML=''; if(urlBar)urlBar.value=''; updateNav(); return; }
   if(urlBar) urlBar.value=entry.url;
+  // NULLFILTER: the operator's own content policy. authored sites are never affected — this only
+  // catches arbitrary URLs the player types toward categories the protagonist refuses to host a route to.
+  if(!siteMap()[entry.url] && nullfilterBlocks(entry.url)){
+    pageEl.className='page';
+    pageEl.innerHTML=`<div style="text-align:center;margin-top:46px;color:var(--green-dim)">
+      <div style="font-size:15px;color:var(--green)">⛔ blocked by NULLFILTER</div>
+      <div class="muted" style="margin-top:8px;font-size:12px">${esc(entry.url)} — local content policy. See the Manual.</div></div>`;
+    updateNav(); renderTabs(); return;
+  }
   let site=siteMap()[entry.url];
-  if(!site) site=proceduralSite(entry.url);   // make the web feel boundless — unknown domains resolve to filler
+  // RULE: links embedded in an AUTHORED site must never dump the player into procedural filler.
+  // if the host is one we authored but this exact path isn't, show a clean in-world dead-end instead.
+  if(!site){
+    const sub=authoredSubpage(entry.url);
+    if(sub){ const skin2=/\.com(\/|$|\?)/.test(entry.url)?'corp':null; pageEl.className='page'+(skin2?' skin-'+skin2:'');
+      pageEl.innerHTML=sub; updateNav(); renderTabs(); return; }
+  }
+  if(!site) site=proceduralSite(entry.url);   // unknown domains resolve to procedural filler (the web feels boundless)
   // skin: clearnet (.com) sites render as bright real websites; .onion stays dark deep-web
   let skin = site && site.skin;
   if(!skin && /\.com(\/|$|\?)/.test(entry.url)) skin='corp';
@@ -1102,6 +1872,20 @@ function render(entry){
 }
 /* Procedural filler: any unknown domain-ish URL resolves to a plausible page (deterministic from
    the URL), so typing or following links never dead-ends. ~20% are genuinely "down" for texture. */
+// the protagonist's own content filter — keeps gore/exploitation/etc. off their relay (diegetic reason
+// those categories never appear). matches arbitrary typed URLs only; authored sites always render.
+// substring terms: distinctive enough to match inside compound domains ("darkgore", "gore-vids")
+const NULLFILTER_SUBSTR=['gore','snuff','childp','childporn','beheading','liveleak','torture','bestiality','porn','xxx','hardcore','onlyfans','redroom'];
+// bounded terms: short / ambiguous, so only match as a standalone token (avoid "grape", "cpanel")
+const NULLFILTER_BOUNDED=['rape','cp','nsfw'];
+// explicit host blocklist — evocatively-named "bad" sites (listed on the wiki for dark-web texture)
+// that don't contain a keyword but should still be dropped on click.
+const NULLFILTER_HOSTS=['thecellar.onion','thebasement.onion','meatmarket.onion','thekillroom.onion','feralcam.onion','the-quiet-place.onion'];
+function nullfilterBlocks(url){ const u=url.toLowerCase();
+  const host=u.replace(/^\w+:\/\//,'').split('/')[0];
+  if(NULLFILTER_HOSTS.includes(host)) return true;
+  if(NULLFILTER_SUBSTR.some(t=>u.includes(t))) return true;
+  return NULLFILTER_BOUNDED.some(t=>new RegExp('(^|[^a-z])'+t+'([^a-z]|$)').test(u)); }
 function hashStr(s){ let h=2166136261; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
 function proceduralSite(url){
   if(/^torch:/.test(url) || !/[a-z0-9-]+\.[a-z]{2,}/i.test(url)) return null;
@@ -1306,7 +2090,7 @@ const CMD={
       [["pwd","print working directory"],["whoami","current user"],["uname","system info"],
        ["date","current date & time"],["echo <text>","print text"],["mkdir <dir>","make a directory"],
        ["touch <file>","create an empty file"],["rm [-rf] <path>","remove files (be careful)"],
-       ["clear","clear the screen"]
+       ["clear","clear the screen"],["reboot","restart the OS (re-run the boot sequence)"]
       ].forEach(([c,d])=>p(`  <b>${esc(c)}</b><span class="c-dim"> — ${esc(d)}</span>`));
       line("  it's a real-ish shell — poke around. `help` for the mission commands.","c-dim");
       return;
@@ -1320,7 +2104,9 @@ const CMD={
      ["ls [path]","list files (localhost when not connected)"],["cd <path>","change directory"],
      ["cat <path>","read a file"],["exfil <path>","copy a remote file to ~/loot/"],
      ["shred <path>","irrecoverably destroy a file"],["upload <drop>","publish ~/loot to a leak drop"],
-     ["disconnect","drop the session"]
+     ["relay","show your own relay connection details (keep them private)"],
+     ["whois <domain>","look up who's behind a site before you trust it"],
+     ["disconnect","drop the session (or shake a trace on your own relay)"]
     ].forEach(([c,d])=>p(`  <b>${esc(c)}</b><span class="c-dim"> — ${esc(d)}</span>`));
     line("  → type `help 2` for system / shell commands.","c-dim");
   },
@@ -1369,8 +2155,7 @@ const CMD={
     const [user,ip]=arg.split('@'); const m=W.machines.find(x=>x.ip===ip);
     if(!m){ line(`no host at ${ip}.`,'c-amber'); return; }
     if(S.loud.has(`${user}@${ip}`)){ line(`already cracked ${user}@${ip}. connect ${user}@${ip} ${m.account.password}`,'c-dim'); return; }
-    if(!S.wordlist){ line("no wordlist loaded. run `wordlist --gen` first.","c-amber"); return; }
-    return crackAnim(m,user,ip);
+    return crackAnim(m,user,ip);   // crack always runs off common.txt; weak passwords fall, derived ones need `wordlist --gen`
   },
   // connect ALWAYS needs the password. trace depends only on whether you `crack`ed this account.
   async connect(arg){
@@ -1440,10 +2225,12 @@ const CMD={
     if(path!==W.mission.target_artifact){ line(`shred: refusing — ${arg} is not the contract target.`,'c-amber'); return; }
     await typeLine(`shredding ${path}`,'c-red',3);
     for(let i=0;i<=100;i+=20){ await sleep(160); line(`  overwriting pass ${i/20+1}/6  [${'█'.repeat(i/10)}${'░'.repeat(10-i/10)}]`,'c-dim'); }
+    const secured=S.exfilDone||S.objComplete;   // already pulled a copy?
     delete m.files[path];
     if(W.mission.objective_type==='shred'){ S.objComplete=true;
       line("  target destroyed. no recoverable copy.","c-red");
       line("► objective complete. now `disconnect` before the trace locks!","c-amber"); }
+    else if(secured){ line("  the original is gone — but you already have your copy. no harm done.","c-dim"); }
     else { line("  the file is gone — shredded to nothing.","c-red");
       failContract(`the client wanted that file ${W.mission.objective_type==='leak'?'leaked':'stolen'}, not destroyed — you burned the asset`); } },
   note(arg){ const f='/root/notes.txt';
@@ -1452,12 +2239,42 @@ const CMD={
     if(arg.startsWith('add ')){ const t=arg.slice(4).trim(); if(!t){ line("usage: note add <text>","c-dim"); return; }
       HOME.files[f]=(HOME.files[f]?HOME.files[f]+'\n':'')+'• '+t; refreshNotesApp(); line("noted.","c-dim"); return; }
     line("usage: note  |  note add <text>  |  note clear","c-dim"); },
-  disconnect(){ if(!S.conn){ line("not connected.","c-dim"); return; }
+  disconnect(){
+    if(selfTraceActive()){ clearSelfTrace(); line("dropped the relay circuit and rebuilt it on fresh nodes. the trace lost you.","c-cyan"); return; }
+    if(!S.conn){ line("not connected.","c-dim"); return; }
     S.conn=null; stopTrace(); S.cwd=HOME.home; updatePrompt();
     line("session dropped. relay scrubbed.","c-dim");
     if(S.objComplete && !S.done) win();
     else if(S.exfilDone && W.mission.objective_type==='leak') line(`loot is in ~/loot. now \`upload ${W.mission.leak_dest}\` to finish.`,"c-amber");
     else line("...but the job isn't done yet.","c-amber"); },
+  relay(){
+    line("relay circuit — this session:","c-dim");
+    line(`  handle        : ${playerHandle}`,'c-white');
+    line(`  session id    : ${playerRelay.sess}`,'c-white');
+    line(`  entry node    : ${playerRelay.entry}`,'c-white');
+    line(`  middle node   : ${playerRelay.middle}`,'c-white');
+    line(`  exit node     : ${playerRelay.exit}`,'c-white');
+    line(`  relay address : ${playerRelay.addr}`,'c-white'); },
+  whois(arg){
+    if(!arg){ line("usage: whois <domain>","c-dim"); return; }
+    const host=arg.replace(/^\w+:\/\//,'').split('/')[0].toLowerCase();
+    const w=(siteMap()[host]&&siteMap()[host].whois);
+    line(`whois ${host}`,'c-dim');
+    if(w){
+      if(w.registrar)  line(`  registrar  : ${w.registrar}`,'c-white');
+      if(w.first_seen) line(`  first seen : ${w.first_seen}`,'c-white');
+      if(w.operator)   line(`  operator   : ${w.operator}`,'c-amber');
+      if(w.note)       line(`  note       : ${w.note}`,'c-amber');
+      return;
+    }
+    if(/\.onion$/.test(host)){
+      line("  registrar  : (none — tor hidden service, no public registration)","c-dim");
+      line("  operator   : not disclosed. hidden services don't answer whois.","c-dim");
+    } else if(/[a-z0-9-]+\.[a-z]{2,}$/.test(host)){
+      line("  registrar  : redacted for privacy (proxy registration)","c-dim");
+      line("  operator   : not disclosed.","c-dim");
+    } else { line("  no whois data for that query.","c-amber"); }
+  },
   whoami(){ line(S.conn?(activeHost().account?activeHost().account.user:'user'):'root','c-white'); },
   uname(){ line("BlackoutOS 2.1 (relay-hardened linux) x86_64","c-white"); },
   date(){ line(new Date().toString(),'c-white'); },
@@ -1471,12 +2288,25 @@ const CMD={
     let recursive=false, t=arg; const fm=arg.match(/^-(\w+)\s+(.*)$/); if(fm){ recursive=/r/.test(fm[1]); t=fm[2]; }
     const path=m.hidden_fs?resolvePath(S.cwd,t):t;
     if(recursive && (path==='/'||path==='/root'||path==='') && m.local){ return systemWipe(); }
-    if(recursive){ const keys=Object.keys(m.files).filter(k=>k===path||k.startsWith(path+'/'));
-      if(!keys.length){ line(`rm: ${t}: no such file or directory`,'c-amber'); return; }
-      keys.forEach(k=>delete m.files[k]); line(`removed ${keys.length} item(s).`,'c-dim'); }
-    else { if(!(path in m.files)){ line(`rm: ${t}: no such file`,'c-amber'); return; } delete m.files[path]; }
+    // figure out what would be removed
+    let keys;
+    if(recursive){ keys=Object.keys(m.files).filter(k=>k===path||k.startsWith(path+'/'));
+      if(!keys.length){ line(`rm: ${t}: no such file or directory`,'c-amber'); return; } }
+    else { if(!(path in m.files)){ line(`rm: ${t}: no such file`,'c-amber'); return; } keys=[path]; }
+    // contract-target protection: destroying the asset on a remote host has consequences
+    if(S.conn && W && keys.includes(W.mission.target_artifact)){
+      const obj=W.mission.objective_type, secured=S.exfilDone||S.objComplete;
+      if((obj==='exfil'||obj==='leak') && !secured){
+        keys.forEach(k=>delete m.files[k]); if(m.local) refreshFilesApp();
+        failContract(`you destroyed the asset before securing a copy — the client wanted it ${obj==='leak'?'leaked':'stolen'}, not gone`); return; }
+      if(obj==='shred' && !S.objComplete){
+        line("rm: the client needs this provably destroyed — use `shred`, not a plain unlink.","c-amber"); return; }
+    }
+    keys.forEach(k=>delete m.files[k]);
+    if(recursive && keys.length>1) line(`removed ${keys.length} item(s).`,'c-dim');
     if(m.local) refreshFilesApp(); },
-  clear(){ out.innerHTML=''; }
+  clear(){ out.innerHTML=''; },
+  reboot(){ line("rebooting relay client ...","c-amber"); setTimeout(rebootOS,400); }
 };
 function completeContract(){ if(S.objComplete && !S.done) win(); }
 function failContract(reason){
@@ -1503,11 +2333,56 @@ async function systemWipe(){
   document.body.appendChild(panic);
 }
 
+/* ---- the player's own relay identity (what a scam site tries to phish out of you) ---- */
+let playerRelay=newRelay();
+function newRelay(){
+  const ip=()=>`${1+Math.floor(Math.random()*223)}.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}.${1+Math.floor(Math.random()*254)}`;
+  const hex=n=>Array.from({length:n},()=>'0123456789abcdef'[Math.floor(Math.random()*16)]).join('');
+  return { sess:'sess#'+String(100+Math.floor(Math.random()*900)), entry:ip(), middle:ip(), exit:ip(), addr:hex(8)+'.'+hex(16)+'.relay' };
+}
+
+/* ---- self-trace: punishment for leaking your own relay details into a scam ("hire a hitman") ---- */
+function selfTraceActive(){ return !!window._selfTrace; }
+function clearSelfTrace(){ if(window._selfTrace){ clearInterval(window._selfTrace.timer); window._selfTrace.el.remove(); window._selfTrace=null; } }
+function startSelfTrace(seconds){
+  if(window._selfTrace) return;
+  let n=seconds||10;
+  const el=document.createElement('div');
+  el.style.cssText='position:fixed;left:0;right:0;top:0;z-index:9998;background:#2a0808;border-bottom:2px solid #e0533f;color:#ff7a5c;font-family:monospace;font-size:14px;text-align:center;padding:10px 14px;line-height:1.5';
+  document.body.appendChild(el);
+  const paint=()=>{ el.innerHTML=`<b>⚠ INCOMING TRACE</b> — your relay address was logged by an unknown party. `
+    +`<b style="color:#fff">${n}s</b> to lose them: <b>disconnect</b> or <b>reboot</b> (ctrl+alt+del).`; };
+  paint();
+  window._selfTrace={ el, timer:setInterval(()=>{ n--; if(n<=0){ clearSelfTrace(); caughtByPolice(); } else paint(); },1000) };
+}
+function caughtByPolice(){
+  clearSelfTrace();
+  if(document.getElementById('caught-overlay')) return;   // only one game-over screen
+  const ov=document.createElement('div'); ov.id='caught-overlay';
+  ov.style.cssText='position:fixed;inset:0;z-index:10001;background:#000;color:#e0533f;font-family:monospace;font-size:14px;padding:48px;white-space:pre-wrap;line-height:1.8;overflow:auto';
+  ov.innerHTML=`<span style="color:#ff7a5c;font-size:18px">TRACE COMPLETE.</span>\n\n`
+    +`Your relay address resolved to a physical location.\n`
+    +`Exit node seized. Session sess# correlated. Home address on file.\n\n`
+    +`<span style="color:#9fb6a6">[ 03:14 ] knock at the door.\n`
+    +`[ 03:14 ] "open up — we have a warrant."\n`
+    +`[ 03:15 ] devices bagged. drives imaged. you did not get to wipe them.</span>\n\n`
+    +`<span style="color:#ff7a5c">You handed your own address to a scam. The one rule out here: never tell anyone where you are.</span>\n\n`
+    +`<button id="caught-reboot" style="background:#10180f;border:1px solid #e0533f;color:#ff7a5c;border-radius:7px;padding:10px 24px;cursor:pointer;font-family:monospace;font-size:13px">reboot — start over</button>`;
+  document.body.appendChild(ov);
+  document.getElementById('caught-reboot').onclick=()=>{ ov.remove(); rebootOS(); };
+}
 const RAND_CHARS='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
 function fakePw(){ const n=6+Math.floor(Math.random()*7); let s=''; for(let i=0;i<n;i++) s+=RAND_CHARS[Math.floor(Math.random()*RAND_CHARS.length)]; return s; }
+// the base 5000-entry common.txt reaches weak/reused passwords on its own; strong ones derived from a
+// target's personal clues only fall once you've built a wordlist from those clues (`wordlist --gen`).
+const COMMON_PASSWORDS=new Set(['password','password1','password123','123456','12345678','qwerty','letmein',
+  'welcome','admin','admin123','root','toor','changeme','iloveyou','monkey','dragon','sunshine','football',
+  'baseball','superman','trustno1','abc123','passw0rd','hunter2','guest','test','login','master','hello123']);
 async function crackAnim(m,user,ip){
   if(user!==m.account.user){ line(`crack: ${m.hostname}: no such user '${user}'.`,'c-amber'); return; }
-  const hit=S.wordlist.includes(m.account.password);
+  const pw=m.account.password;
+  const inGen=!!(S.wordlist && S.wordlist.includes(pw));
+  const hit = inGen || COMMON_PASSWORDS.has(pw.toLowerCase()) || m.weak_pw===true;
   await typeLine(`crack: dictionary attack on ${user}@${ip} (wordlist: common.txt, 5000 entries)`,'c-dim',3);
   const found = hit ? 200+Math.floor(Math.random()*4400) : 5000;   // where in the 5000 it "hits"
   const d=document.createElement('div'); d.className='c-dim'; out.appendChild(d);
@@ -1520,13 +2395,21 @@ async function crackAnim(m,user,ip){
     line(`  connect ${user}@${ip} ${m.account.password}`,'c-dim');
   } else {
     d.textContent=`  5000/5000   no match`;
-    line(`  password not in common.txt. derive it from recon, or gather more clues.`,'c-amber');
+    if(!S.wordlist) line(`  not in common.txt — this one isn't weak. read the target's life, then \`wordlist --gen\` and crack again.`,'c-amber');
+    else line(`  still not in the list. you're missing a clue — keep digging, then re-gen the wordlist.`,'c-amber');
   }
 }
 function win(){ S.done=true; stopTrace();
+  const paid=activeContract && !PROGRESS.completed.includes(activeContract.id);
   line(""); line("════════════════════════════════════════════","c-cyan");
   line(" CONTRACT COMPLETE — clean exit, no trace.","c-cyan");
   line(` ${W.mission.target_name} will never know it was here.`,"c-cyan");
+  if(activeContract && paid){
+    awardPayout(activeContract);
+    line(` payment cleared: ${activeContract.payout}  ·  balance ${fmtBtc(PROGRESS.balance)}`,"c-amber");
+  } else if(activeContract){
+    line(` (replay — already paid for "${activeContract.name}")`,"c-dim");
+  }
   line("════════════════════════════════════════════","c-cyan");
   line("Open Contracts (taskbar ▣) for the next job.","c-dim"); lockInput();
 }
@@ -1558,6 +2441,9 @@ function wireInput(){
     line(`root@${S.conn?activeHost().hostname:'localhost'}:~$ ${raw}`,'c-dim');
     const [name,...rest]=raw.split(/\s+/); const fn=CMD[name];
     if(!fn){ line(`${name}: command not found. try \`help\`.`,'c-amber'); return; }
+    // mission commands need an active contract — otherwise W is null and they'd throw.
+    const MISSION_CMDS=new Set(['mission','facts','scan','wordlist','crack','connect','exfil','shred','upload']);
+    if(MISSION_CMDS.has(name) && !W){ line("no active contract. open Contracts (taskbar ▣) and take a job first.","c-amber"); return; }
     try{ await fn(rest.join(' ')); }catch(err){ line("internal error: "+err.message,'c-red'); }
   });
 }
@@ -1567,20 +2453,30 @@ function wireInput(){
    ========================================================================== */
 function openContracts(){
   const rec=createWindow('contracts','● CONTRACTS',{x:140,y:50,w:560,h:560});
-  rec.body.innerHTML=`<div class="board"><h1>BLACKOUT</h1><div class="sub">// contract board · select a job</div>
+  rec.body.innerHTML=`<div class="board"><h1>BLACKOUT</h1>
+    <div class="sub">// contract board · select a job · balance <b style="color:var(--amber)">${fmtBtc(PROGRESS.balance)}</b></div>
     <div class="clist"></div></div>`;
   const list=rec.body.querySelector('.clist');
-  list.innerHTML=CONTRACTS.map(c=>`<div class="contract" data-id="${c.id}">
-      <div class="payout">${c.payout}</div><div class="cn">${esc(c.name)}</div>
-      <div class="diff diff-${c.difficulty}">● ${c.difficulty} RISK</div>
-      <div class="desc">${esc(c.desc)}</div>
-      <div class="tags">${c.tags.map(t=>`<span class="ctag">${esc(t)}</span>`).join('')}</div></div>`).join('');
-  list.querySelectorAll('.contract').forEach(el=>el.onclick=()=>startContract(el.dataset.id));
+  const avail=CONTRACTS.filter(c=>!PROGRESS.completed.includes(c.id));
+  if(!avail.length){
+    list.innerHTML=`<div class="muted" style="padding:30px 6px;line-height:1.7">
+      You've cleared every contract on the board. Nothing new has come in.
+      <br><br>Total earned: <b style="color:var(--amber)">${fmtBtc(PROGRESS.balance)}</b>.
+      <br><span style="font-size:11px">New work appears here when it's posted. Check back, or keep digging on the deep web.</span></div>`;
+  } else {
+    list.innerHTML=avail.map(c=>`<div class="contract" data-id="${c.id}">
+        <div class="payout">${c.payout}</div><div class="cn">${esc(c.name)}</div>
+        <div class="diff diff-${c.difficulty}">● ${c.difficulty} RISK</div>
+        <div class="desc">${esc(c.desc)}</div>
+        <div class="tags">${c.tags.map(t=>`<span class="ctag">${esc(t)}</span>`).join('')}</div></div>`).join('');
+    list.querySelectorAll('.contract').forEach(el=>el.onclick=()=>startContract(el.dataset.id));
+  }
   focusWindow('contracts');
 }
 function startContract(id){
   const c=CONTRACTS.find(x=>x.id===id); if(!c)return;
   if(W && !S.done){ if(!confirm('Abandon the current contract and start "'+c.name+'"? Your progress is lost.')) return; }
+  activeContract=c;
   runGen++; W=(window.structuredClone?structuredClone(c.world):JSON.parse(JSON.stringify(c.world))); resetState();
   W.mission.faceId=Math.floor(Math.random()*100);
   W.machines.forEach(m=>{ if(m.exposed) S.knownSubnets.add(m.subnet); });
@@ -1688,7 +2584,17 @@ const MANUAL=[
     <p>· Read the whole page — the clue is rarely the obvious bit.<br>
     · Keep notes; targets reuse details across sites.<br>
     · Derive the password and <b>login</b> to stay invisible on guarded systems.<br>
-    · The deep web is bigger than the contract — explore it.</p>`}
+    · The deep web is bigger than the contract — explore it.</p>`},
+  {t:"NULLFILTER", h:`<h2>NULLFILTER — your content policy</h2>
+    <p>NULLFILTER is a filter you wrote and run at boot. The deep web has a floor under it — gore, exploitation,
+    the trade in real suffering. You don't host a route to any of it, you don't carry traffic for it, and you
+    don't take jobs that touch it.</p>
+    <p>When you follow a link or type an address that matches the policy, the page is replaced with a short
+    <b>"blocked by NULLFILTER"</b> notice and no connection is opened. You'll see those links around the deep web —
+    on the Hidden Wiki and elsewhere — because the network really is full of them. You just don't load them.</p>
+    <p class="muted">This only affects arbitrary addresses you navigate to. It never touches search, and it never
+    blocks a site a contract needs. The block is yours, by design — there's an in-world note at
+    <b>nullfilter.local</b> if you want to read why you set it.</p>`}
 ];
 function openManual(){
   const rec=createWindow('manual','● MANUAL',{x:170,y:60,w:620,h:520});
@@ -1751,44 +2657,210 @@ function buildIcons(){
   document.getElementById('icons').innerHTML=ICONS.map(i=>
     `<div class="dicon" data-id="${i.id}"><div class="gl">${i.glyph}</div>${i.label}</div>`).join('');
   document.querySelectorAll('.dicon').forEach(el=>el.ondblclick=el.onclick=()=>ICONS.find(i=>i.id===el.dataset.id).fn());
-  document.getElementById('start').onclick=openContracts;
+  const sm=document.getElementById('startmenu');
+  sm.innerHTML=ICONS.map(i=>`<div class="smi" data-id="${i.id}"><span class="g">${i.glyph}</span>${i.label}</div>`).join('')
+    +`<div class="sep"></div><div class="smi" data-act="reboot"><span class="g">⏻</span>Reboot</div>`;
+  sm.querySelectorAll('.smi').forEach(el=>el.onclick=()=>{
+    sm.classList.add('hidden');
+    if(el.dataset.act==='reboot') rebootOS();
+    else ICONS.find(i=>i.id===el.dataset.id).fn();
+  });
+  document.getElementById('start').onclick=(e)=>{ e.stopPropagation(); sm.classList.toggle('hidden'); };
+  document.addEventListener('click',e=>{ if(!sm.contains(e.target) && e.target.id!=='start') sm.classList.add('hidden'); });
 }
 
 /* ============================================================================
-   BOOT SEQUENCE
+   BOOT SEQUENCE  (interruptible → drops to an interactive maintenance shell)
    ========================================================================== */
-async function bootSequence(){
-  const b=document.getElementById('boot');
-  const logo=
+const BOOT_LOGO=
 `   ██████╗ ██╗      █████╗  ██████╗██╗  ██╗ ██████╗ ██╗   ██╗████████╗
    ██╔══██╗██║     ██╔══██╗██╔════╝██║ ██╔╝██╔═══██╗██║   ██║╚══██╔══╝
    ██████╔╝██║     ███████║██║     █████╔╝ ██║   ██║██║   ██║   ██║
    ██╔══██╗██║     ██╔══██║██║     ██╔═██╗ ██║   ██║██║   ██║   ██║
    ██████╔╝███████╗██║  ██║╚██████╗██║  ██╗╚██████╔╝╚██████╔╝   ██║
    ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝ ╚═════╝  ╚═════╝    ╚═╝`;
+async function bootSequence(){
+  const b=document.getElementById('boot');
+  document.getElementById('login').classList.add('hidden');
+  b.classList.remove('hidden');
   const ok='<span style="color:var(--green)">  OK  </span>';
-  const steps=[
-    "Reached target Cryptographic Relays","Mounted /dev/relay0 (LUKS encrypted)",
-    "Started Onion Circuit Builder","Started MAC Address Spoofer","Started Kill-Switch Watchdog",
-    "Reached target Network (anonymised)","Started blackwm window manager","Reached target Graphical Interface"
+  const dim=s=>`<span style="color:#5f6f63">${s}</span>`;
+  // kernel ring-buffer style lines (dmesg) — printed fast, with rising timestamps
+  let t=0.0; const ts=()=>{ t+=0.01+Math.random()*0.09; return `[ ${t.toFixed(6).padStart(11)}]`; };
+  const kernel=[
+    `Linux version 6.9.0-relay (root@blackout) #1 SMP PREEMPT_DYNAMIC`,
+    `Command line: BOOT_IMAGE=/boot/vmlinuz-6.9.0-relay ro quiet relay.boot=auto`,
+    `CPU: 8 x synthetic cores, relay-hardened microcode 0x1a7`,
+    `Memory: 15823M/16384M available (reserving 561M for tmpfs)`,
+    `Spectre/Meltdown: mitigations active · randomize_kstack: on`,
+    `dm-crypt: probing /dev/relay0 ... LUKS2 header (aes-xts-plain64) found`,
+    `random: crng init done (entropy harvested from relay jitter)`,
+    `systemd[1]: Detected architecture x86-64. Hostname set to blackout.`
   ];
-  let interrupted=false; const onInt=()=>{ interrupted=true; };
-  window.addEventListener('keydown',onInt); window.addEventListener('mousedown',onInt);
-  b.innerHTML=`<span style="color:var(--green)">${logo}</span>\n\n   BLACKOUT/Linux 6.9.0-relay (tty1) · v${VERSION}\n   kernel: relay-hardened · uptime 0.0s\n\n`;
-  await sleep(700);
-  for(const s of steps){ b.innerHTML+=`[${ok}] ${s}\n`; await sleep(170+Math.random()*190); }
-  b.innerHTML+=`\n   ░░░░░░░░░░░░░░░░░░░░  mounting userland\n`;
-  await sleep(550);
-  window.removeEventListener('keydown',onInt); window.removeEventListener('mousedown',onInt);
-  if(interrupted){   // lore seed — boot interrupted (story hook, TBD)
-    b.innerHTML+=`\n<span style="color:#e0533f">[ ?? ] unscheduled interrupt on relay0\n       ...you are not the first to log in here.\n       [ that thread doesn't go anywhere yet ]</span>\n`;
-    await sleep(1500);
+  // systemd-style mounts + fsck (directories listed) then services
+  const fsck=[
+    `Found device <b>/dev/relay0</b>.`,
+    dim(`         fsck /dev/relay0: clean, 284913/1310720 files, 0 orphan inodes`),
+    `Mounted <b>/</b> (root, read-only).`,
+    `Mounted <b>/boot</b>.`,
+    `Mounted <b>/home</b> (LUKS, encrypted).`,
+    `Mounted <b>/var/log/relay</b>.`,
+    `Mounted <b>/tmp</b> (tmpfs · RAM-only · wiped on reboot).`,
+    `Reached target <b>Local Encrypted Volumes</b>.`
+  ];
+  const services=[
+    `Started udev Kernel Device Manager.`,
+    `Started Journal Service (logs route to /var/log/relay).`,
+    `Started Onion Circuit Builder (3-hop default).`,
+    `Started MAC Address Spoofer.`,
+    `Started Kill-Switch Watchdog.`,
+    `Started NULLFILTER content-policy daemon.`,
+    `Reached target Network (anonymised via relay).`,
+    `Started blackwm window manager.`,
+    `Reached target Graphical Interface.`
+  ];
+  // boot is interruptible, but the sequence isn't advertised — it's a real terminal interrupt (Ctrl+C / SIGINT).
+  // (the lore conversation between the two operators will reveal/confirm this later.)
+  let interrupted=false;
+  const onInt=(e)=>{ if(e.ctrlKey && (e.key==='c'||e.key==='C')){ e.preventDefault(); interrupted=true; } };
+  window.addEventListener('keydown',onInt);
+  b.innerHTML=`<span style="color:var(--green)">${BOOT_LOGO}</span>\n\n`
+    +`   BLACKOUT/Linux 6.9.0-relay (tty1) · v${VERSION}\n\n`;
+  await sleep(380);
+  for(const k of kernel){ if(interrupted) break; b.innerHTML+=`${dim(ts())} ${k}\n`; b.scrollTop=b.scrollHeight; await sleep(55+Math.random()*70); }
+  if(!interrupted){ b.innerHTML+=`\n`; await sleep(160); }
+  for(const s of fsck){ if(interrupted) break; b.innerHTML+=(s.startsWith('<span')?`${s}\n`:`[${ok}] ${s}\n`); b.scrollTop=b.scrollHeight; await sleep(95+Math.random()*120); }
+  for(const s of services){ if(interrupted) break; b.innerHTML+=`[${ok}] ${s}\n`; b.scrollTop=b.scrollHeight; await sleep(120+Math.random()*150); }
+  window.removeEventListener('keydown',onInt);
+  if(interrupted){
+    b.innerHTML+=`\n<span style="color:var(--amber)">^C  caught SIGINT — halting init, dropping to maintenance shell.</span>\n`;
+    await sleep(500);
+    return maintenanceShell();
   }
-  await sleep(450);
-  b.classList.add('hidden');
-  document.getElementById('login').classList.remove('hidden');
+  b.innerHTML+=`\n${dim('   starting blackwm session ...')}\n`;
+  await sleep(500);
+  proceedToLogin();
 }
-let playerHandle='operator';
+function proceedToLogin(){
+  const b=document.getElementById('boot');
+  b.classList.add('hidden'); b.onkeydown=null;
+  if(PROGRESS.handle) return returningLogin();   // relay remembers you — no handle picker, no rejection
+  document.getElementById('login').classList.remove('hidden');
+  const u=document.getElementById('login-user'); if(u) setTimeout(()=>u.focus(),50);
+}
+// generate a believable relay-node IP from a few known hosting ranges
+function randRelayIP(){
+  const blocks=[[185,220,101],[185,220,100],[51,15,null],[94,142,null],[176,10,null],[199,249,230],
+    [104,244,null],[171,25,193],[45,66,null],[162,247,74],[23,129,64],[204,13,164]];
+  const b=blocks[Math.floor(Math.random()*blocks.length)];
+  const oct=v=>v===null?Math.floor(Math.random()*254)+1:v;
+  return `${oct(b[0])}.${oct(b[1])}.${oct(b[2])}.${Math.floor(Math.random()*254)+1}`;
+}
+async function maintenanceShell(){
+  const b=document.getElementById('boot');
+  b.innerHTML=`<span style="color:var(--green)">BLACKOUT relay · maintenance shell (recovery tty)</span>\n`
+    +`<span style="color:#7d8a7f">root filesystem mounted read-only. type \`help\` for commands, \`continue\` to finish booting.</span>\n\n`;
+  const log=document.createElement('span'); b.appendChild(log);
+  const promptLine=document.createElement('div'); promptLine.style.cssText='display:flex;gap:6px;align-items:baseline';
+  promptLine.innerHTML=`<span style="color:var(--green)">relay:~#</span>`;
+  const inp=document.createElement('input');
+  inp.style.cssText='flex:1;background:transparent;border:none;outline:none;color:var(--green);font-family:var(--mono);font-size:13px';
+  inp.autocomplete='off'; inp.spellcheck=false;
+  promptLine.appendChild(inp); b.appendChild(promptLine);
+  const echo=(html)=>{ log.innerHTML+=html+'\n'; b.scrollTop=b.scrollHeight; };
+  setTimeout(()=>inp.focus(),30);
+  b.onclick=()=>inp.focus();
+  const SHELL_FILES={
+    'relay.conf':`# /etc/blackout/relay.conf  (read-only)\nmode             = transit\nlog_circuits     = true\nlog_retention    = indefinite\nreport_interval  = 30s\nupstream_report  = 185.220.101.99\noperator         = (redacted)`,
+    'sessions.log':`relay session table — last rotation: never\n  active sessions : 911\n  this console    : sess#0447   uptime 00:00\n  oldest session  : sess#0001   uptime 2317d   [persistent]\n  flagged         : 0`,
+    'motd':`relay0 · message of the day\n\n  authorized maintenance only. activity on this node is reported upstream.\n  session sess#0001 has held this console open for 2317 days. it left one line here:\n\n    "you'll want the room, not the relay.\n     46 . 165 . _ _ _ . 99\n     the middle is counted out on fifteen."`
+  };
+  return new Promise(resolve=>{
+    inp.addEventListener('keydown',async e=>{
+      if(e.key!=='Enter') return;
+      const raw=inp.value.trim(); inp.value='';
+      echo(`<span style="color:var(--green)">relay:~#</span> <span style="color:#cfe">${esc(raw)}</span>`);
+      if(!raw) return;
+      const [c,...rest]=raw.split(/\s+/); const arg=rest.join(' ');
+      switch(c){
+        case 'help': echo(
+          `  <b>help</b>        this list\n`+
+          `  <b>scan</b>        enumerate reachable relay nodes\n`+
+          `  <b>ls</b>          list recovery files\n`+
+          `  <b>cat</b> &lt;file&gt;   read a file\n`+
+          `  <b>who</b>         show sessions on this relay\n`+
+          `  <b>whoami</b>      current user\n`+
+          `  <b>uname</b>       system information\n`+
+          `  <b>clear</b>       clear the screen\n`+
+          `  <b>continue</b>    resume booting to the login screen`); break;
+        case 'whoami': echo('root  <span style="color:#7d8a7f">(uid=0 · relay maintenance)</span>'); break;
+        case 'uname': echo('BLACKOUT/Linux 6.9.0-relay recovery x86_64'); break;
+        case 'ls': echo('relay.conf   sessions.log   motd'); break;
+        case 'cat':
+          if(!arg){ echo('<span style="color:var(--amber)">usage: cat &lt;file&gt;</span>'); break; }
+          if(SHELL_FILES[arg]) echo('<span style="color:#bcd">'+esc(SHELL_FILES[arg])+'</span>');
+          else echo(`<span style="color:var(--amber)">cat: ${esc(arg)}: no such file</span>`);
+          break;
+        case 'who': echo(
+          '911 sessions attached to relay0.\n'+
+          '  sess#0001   ?            2317d   <span style="color:var(--amber)">[persistent · never disconnected]</span>\n'+
+          '  sess#0447   '+esc('this console')+'   00:00\n'+
+          '  ...909 more (anonymised). use <b>scan</b> to enumerate node addresses.'); break;
+        case 'scan': {
+          echo('<span style="color:#7d8a7f">scanning relay mesh — enumerating reachable nodes ...</span>');
+          await sleep(260);
+          const n=180+Math.floor(Math.random()*200);             // a few hundred
+          const ips=['185.220.101.99']; const seen=new Set(ips);  // node [0001] = the upstream from relay.conf
+          while(ips.length<n){ const ip=randRelayIP(); if(!seen.has(ip)){ seen.add(ip); ips.push(ip); } }
+          echo('<span style="color:#7d8a7f">  NODE     ADDRESS             ROLE</span>');
+          let rows='';
+          ips.forEach((ip,i)=>{ const id='['+String(i+1).padStart(4,'0')+']';
+            rows += (i===0)
+              ? `  <span style="color:var(--amber)">${id}   ${ip.padEnd(18)}▸ upstream · operator</span>\n`
+              : `  ${id}   ${ip.padEnd(18)}transit\n`;
+          });
+          echo('<span style="color:#8fb89c;font-size:12px">'+rows.trimEnd()+'</span>');
+          echo(`<span style="color:var(--amber)">${n} nodes reachable. every circuit reports to node [0001] — cross-check relay.conf.</span>`);
+          b.scrollTop=b.scrollHeight; break;
+        }
+        case 'clear': log.innerHTML=''; break;
+        case 'continue': case 'boot': case 'exit':
+          echo('<span style="color:#7d8a7f">resuming boot ...</span>');
+          inp.disabled=true; await sleep(500);
+          proceedToLogin(); resolve(); break;
+        default: echo(`<span style="color:var(--amber)">${esc(c)}: command not found. try \`help\`.</span>`);
+      }
+      b.scrollTop=b.scrollHeight;
+    });
+  });
+}
+
+/* ---- reboot the OS in-app (re-run boot without reloading the page) ---- */
+async function rebootOS(){
+  if(W && !S.done){ if(!confirm('Reboot now? The current contract will be abandoned.')) return; }
+  killIdiotVirus();   // a reboot is the only way out of the gag
+  clearSelfTrace(); playerRelay=newRelay();   // fresh relay identity on reboot — shakes any self-trace
+  const co=document.getElementById('caught-overlay'); if(co) co.remove();
+  // tear down the running desktop session
+  Object.keys(WIN).forEach(k=>delete WIN[k]);
+  document.getElementById('windows').innerHTML='';
+  document.getElementById('icons').innerHTML='';
+  document.getElementById('tasklist').innerHTML='';
+  document.getElementById('tb-status').textContent=''; delete document.getElementById('tb-status').dataset.contract;
+  zTop=10; out=cmd=urlBar=pageEl=promptEl=traceEl=null;
+  tabs=[{hist:[],hi:-1}]; activeTab=0;
+  W=null; activeContract=null; resetState();
+  await bootSequence();
+}
+let playerHandle=PROGRESS.handle||'operator';
+// shared unlock animation → desktop (used by both first-time and returning logins)
+async function enterDesktop(btn,steps){
+  for(const s of (steps||['decrypting home volume','establishing relay circuit','spawning desktop'])){
+    if(btn) btn.textContent=s+' …'; await sleep(300+Math.random()*220); }
+  document.getElementById('login').classList.add('hidden');
+  buildIcons(); openContracts();
+  if(btn){ btn.disabled=false; btn.textContent='unlock relay'; }
+}
 async function login(){
   const btn=document.getElementById('login-btn'); if(btn.disabled) return;
   const inp=document.getElementById('login-user'), msg=document.getElementById('login-msg');
@@ -1801,20 +2873,50 @@ async function login(){
   // the handle must be unique on the relay. digits make a collision much less likely.
   const reject = Math.random() < (/\d/.test(name) ? 0.12 : 0.45);
   if(reject){ setMsg(`"${name}" already exists on the relay — pick a name that doesn't exist (adding numbers helps).`,'var(--red)'); btn.disabled=false; btn.textContent='unlock relay'; return; }
-  playerHandle=name; setMsg('handle accepted.','var(--green)');
-  for(const s of ['decrypting home volume','establishing relay circuit','spawning desktop']){ btn.textContent=s+' …'; await sleep(360+Math.random()*240); }
-  document.getElementById('login').classList.add('hidden');
-  buildIcons(); openContracts();
-  btn.disabled=false; btn.textContent='unlock relay';
+  // claimed: the relay now remembers this handle. you won't be asked again on this machine.
+  playerHandle=name; PROGRESS.handle=name; saveProgress(); setMsg('handle accepted.','var(--green)');
+  await enterDesktop(btn);
+}
+// returning user — the relay already knows this handle. skip the picker, just re-establish the circuit.
+// returning user — the relay remembers the handle. offer CONTINUE (keep progress) or START OVER (wipe it).
+// this is what stops an accidental refresh from costing you anything.
+function returningLogin(){
+  playerHandle=PROGRESS.handle;
+  const login=document.getElementById('login');
+  const inp=document.getElementById('login-user'); inp.style.display='none';
+  document.querySelector('#login .uname').textContent='welcome back, '+PROGRESS.handle;
+  const msg=document.getElementById('login-msg');
+  msg.innerHTML=`balance <b style="color:var(--amber)">${fmtBtc(PROGRESS.balance)}</b> · ${PROGRESS.completed.length} contract(s) completed`;
+  msg.style.color='var(--green-dim)';
+  const btn=document.getElementById('login-btn'); btn.disabled=false; btn.textContent='continue';
+  // a secondary "start over" control under the button
+  let so=document.getElementById('startover-btn');
+  if(!so){ so=document.createElement('div'); so.id='startover-btn';
+    so.style.cssText='margin-top:2px;font-size:11px;color:var(--green-dim);cursor:pointer';
+    btn.parentNode.appendChild(so); }
+  so.textContent='start over (wipe balance, contracts & handle)';
+  so.style.display='block';
+  login.classList.remove('hidden');
+  btn.onclick=()=>{ btn.disabled=true; so.style.display='none'; enterDesktop(btn,['re-establishing relay circuit','restoring session','spawning desktop']); };
+  so.onclick=()=>{
+    if(!confirm('Start over? This wipes your balance, completed contracts, and handle. This cannot be undone.')) return;
+    PROGRESS.balance=0; PROGRESS.completed=[]; PROGRESS.handle=null; saveProgress(); updateWallet();
+    so.style.display='none'; inp.style.display=''; inp.value='';
+    document.querySelector('#login .uname').textContent='choose a relay handle';
+    msg.textContent=''; btn.textContent='unlock relay'; btn.onclick=login; inp.focus();
+  };
 }
 
 resetState();   // initialise S.* so free-roam browsing (services etc.) works before any contract
 applySettings();
 setWallpaper();
+updateWallet();
 document.getElementById('login-sub').textContent='// secure operating environment · v'+VERSION;
 tickClock(); setInterval(tickClock,15000);
 document.getElementById('login-btn').onclick=login;
 document.getElementById('login-user').addEventListener('keydown',e=>{ if(e.key==='Enter') login(); });
+// global reboot combo — works even when something (e.g. the idiot-virus gag) has taken over the screen.
+window.addEventListener('keydown',e=>{ if(e.ctrlKey&&e.altKey&&(e.key==='Delete'||e.key==='Backspace')){ e.preventDefault(); rebootOS(); } });
 bootSequence();
 </script>
 </body>
