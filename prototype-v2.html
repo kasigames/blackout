@@ -244,13 +244,16 @@
 /* ============================================================================
    BLACKOUT — single source of truth for the version number
    ========================================================================== */
-const VERSION = '0.7.0';
+const VERSION = '0.8.0';
 
 /* ============================================================================
    PLAYER PROGRESS — money + completed contracts (persisted to localStorage)
    ========================================================================== */
-const PROGRESS=Object.assign({balance:0, completed:[]},
+const PROGRESS=Object.assign({balance:0, completed:[], tools:[]},
   (()=>{ try{ return JSON.parse(localStorage.getItem('blackout_progress')||'{}'); }catch(e){ return {}; } })());
+if(!PROGRESS.tools) PROGRESS.tools=[];
+if(!PROGRESS.charges) PROGRESS.charges={};
+function ownsTool(id){ return PROGRESS.tools.includes(id); }
 function saveProgress(){ try{ localStorage.setItem('blackout_progress',JSON.stringify(PROGRESS)); }catch(e){} }
 // payouts are written as "₿0.4" strings; parse the number out for arithmetic.
 function parsePayout(s){ const m=String(s||'').match(/([\d.]+)/); return m?parseFloat(m[1]):0; }
@@ -261,10 +264,13 @@ function updateWallet(bump){
   if(bump){ const w=document.getElementById('wallet'); if(w){ w.classList.remove('bump'); void w.offsetWidth; w.classList.add('bump'); } }
 }
 function awardPayout(contract){
-  if(!contract) return;
-  PROGRESS.balance += parsePayout(contract.payout);
+  if(!contract) return 0;
+  const base=parsePayout(contract.payout);
+  const bonus = base * ((S.scrapeLevel||0)*0.1);   // bit-scraper: +10/20/30%
+  PROGRESS.balance = Math.round((PROGRESS.balance + base + bonus)*100)/100;
   if(contract.id && !PROGRESS.completed.includes(contract.id)) PROGRESS.completed.push(contract.id);
   saveProgress(); updateWallet(true);
+  return bonus;
 }
 
 /* ============================================================================
@@ -272,7 +278,7 @@ function awardPayout(contract){
    ========================================================================== */
 const CONTRACTS = [
 {
-  id:"paper-trail", name:"Paper Trail", difficulty:"LOW", payout:"₿0.4",
+  id:"paper-trail", name:"Paper Trail", difficulty:"LOW", payout:"₿3",
   tags:["SINGLE TARGET","SOCIAL ENG.","TRACED"],
   desc:"A lawyer is sitting on a settlement draft. Get onto her workstation and shred it before the morning backup. One machine, one document — but you'll have to read to find the password.",
   world:{
@@ -297,7 +303,7 @@ const CONTRACTS = [
       subnet:{label:"Partner subnet", value:"10.0.4.0/24", type:"lead"}
     },
     machines:[
-      { ip:"10.0.4.17", hostname:"dkeller-ws", label:"Diane Keller — workstation  [IDS]",
+      { ip:"10.0.4.17", hostname:"dkeller-ws", label:"Diane Keller — workstation ",
         subnet:"10.0.4.0/24", ids:true, trace_seconds:75, hidden_fs:false, home:"/home/dkeller",
         account:{user:"dkeller", password:"Biscuit1971"},
         files:{
@@ -371,7 +377,7 @@ const CONTRACTS = [
   }
 },
 {
-  id:"glass-house", name:"Glass House", difficulty:"HIGH", payout:"₿2.1",
+  id:"glass-house", name:"Glass House", difficulty:"HIGH", payout:"₿42",
   tags:["MULTI-STAGE","LATERAL MOVE","HIDDEN FS","TRACED CORE"],
   desc:"Burn a buried audit at Veridian Dynamics. No direct route in — socially engineer a front-desk login, pivot to the internal file server, then find the file yourself. The core is watched.",
   world:{
@@ -405,7 +411,7 @@ const CONTRACTS = [
           "/home/treyes/lunch_orders.xlsx":"[spreadsheet] who owes for the taco run. not your problem."
         }
       },
-      { ip:"10.20.0.40", hostname:"vd-fileserver", label:"Veridian internal file server  [IDS]",
+      { ip:"10.20.0.40", hostname:"vd-fileserver", label:"Veridian internal file server ",
         subnet:"10.20.0.0/24", ids:true, trace_seconds:60, hidden_fs:true, home:"/",
         account:{user:"svc_backup", password:"Pinecone$Vault9"},
         files:{
@@ -459,7 +465,7 @@ const CONTRACTS = [
   }
 },
 {
-  id:"cold-inbox", name:"Cold Inbox", difficulty:"MEDIUM", payout:"₿1.3",
+  id:"cold-inbox", name:"Cold Inbox", difficulty:"HIGH", payout:"₿38",
   tags:["NO PROFILE","EMAIL PIVOT","PASSWORD RESET"],
   desc:"Marcus Vance is a fixer who keeps leverage on people — including our client. He's a ghost: no socials, nothing to social-engineer. The way in is his inbox. Pivot through a password reset and burn the dossier.",
   world:{
@@ -482,8 +488,8 @@ const CONTRACTS = [
       persp:{label:"Reused password (breach)", value:"sunflower93", type:"lead"}
     },
     machines:[
-      { ip:"10.30.7.5", hostname:"mvance-ws", label:"Marcus Vance — workstation  [IDS]",
-        subnet:"10.30.7.0/24", ids:true, trace_seconds:90, hidden_fs:false, home:"/home/mvance",
+      { ip:"10.30.7.5", hostname:"mvance-ws", label:"Marcus Vance — workstation ",
+        subnet:"10.30.7.0/24", ids:true, trace_seconds:55, hidden_fs:false, home:"/home/mvance",
         account:{user:"mvance", password:"Redact0r!2021"},
         files:{
           "/home/mvance/private/leverage.7z":"[ENCRYPTED ARCHIVE · 64MB] “leverage” — photos, recordings, signed statements.",
@@ -505,12 +511,20 @@ const CONTRACTS = [
       "leakbase.onion/q/marcus-vance":{ discover:["perse","persp"],
         keywords:"marcus vance leak breach dump database password quikmail combolist", title:"LeakBase — breach index",
         html:`<h1>LeakBase <span class="muted" style="font-size:12px">· breach index</span></h1>
-          <p class="muted">Aggregated credential dumps. 1 result for “marcus vance”.</p>
+          <p class="muted">Aggregated credential dumps. 4 results for “m vance”. Most are stale or the wrong person.</p>
+          <div class="card">ForumNexus (2019 dump)<br>
+            email: <b>marc.vance@quikmail.onion</b><br>password: <b>Liverpool!1</b><br>
+            <span class="muted">unrelated — a Marc Vance in Leeds. different person.</span></div>
+          <div class="card">ShopCart breach (2020 dump)<br>
+            email: <b>m.vance@vanceadvisory.onion</b><br>password: <b>Spring2018</b><br>
+            <span class="muted">work address — but this hash predates his last reset. likely dead.</span></div>
           <div class="card">QuikMail combolist (2022 dump)<br>
-            email: <b>mvance.home@quikmail.onion</b><br>
-            password: <b>sunflower93</b><br>
-            <span class="muted">sign in at quikmail.onion</span></div>
-          <p class="muted">Records are scraped from public breaches. LeakBase does not verify current validity.</p>` },
+            email: <b>mvance.home@quikmail.onion</b><br>password: <b>sunflower93</b><br>
+            <span class="muted">personal account. most recent of the four.</span></div>
+          <div class="card">PixelForum (2015 dump)<br>
+            email: <b>vance_m@quikmail.onion</b><br>password: <b>hunter2</b><br>
+            <span class="muted">ancient. dead host.</span></div>
+          <p class="muted">Records scraped from public breaches. LeakBase does not verify current validity — that's on you.</p>` },
       "quikmail.onion":{ type:"service", title:"QuikMail",
         keywords:"quikmail mail webmail personal email vance",
         service:{
@@ -540,7 +554,7 @@ const CONTRACTS = [
   }
 },
 {
-  id:"sideline", name:"Sideline", difficulty:"MEDIUM", payout:"₿1.0",
+  id:"sideline", name:"Sideline", difficulty:"MEDIUM", payout:"₿14",
   tags:["EXFIL","SOCIAL ENG.","TRACED"],
   desc:"Meridian's procurement lead is sitting on a sealed rival bid. The client wants a copy — quietly. Get in, pull the file to your box, get out. Don't destroy anything; just take it.",
   world:{
@@ -564,7 +578,7 @@ const CONTRACTS = [
       sub:{label:"Office subnet", value:"10.5.0.0/24", type:"lead"}
     },
     machines:[
-      { ip:"10.5.0.22", hostname:"kwu-ws", label:"Karen Wu — workstation  [IDS]",
+      { ip:"10.5.0.22", hostname:"kwu-ws", label:"Karen Wu — workstation ",
         subnet:"10.5.0.0/24", ids:true, trace_seconds:80, hidden_fs:false, home:"/home/kwu",
         account:{user:"kwu", password:"Lily2009"},
         files:{
@@ -601,7 +615,7 @@ const CONTRACTS = [
   }
 },
 {
-  id:"daylight", name:"Daylight", difficulty:"HIGH", payout:"₿2.4",
+  id:"daylight", name:"Daylight", difficulty:"HIGH", payout:"₿50",
   tags:["EXFIL","LEAK","TRACED"],
   desc:"A pharma exec buried a trial result that should have gone public. Pull the data off his machine and put it somewhere it can't be hidden again — a leak drop the client trusts.",
   world:{
@@ -625,7 +639,7 @@ const CONTRACTS = [
       sub:{label:"Research subnet", value:"10.8.2.0/24", type:"lead"}
     },
     machines:[
-      { ip:"10.8.2.10", hostname:"voss-ws", label:"Alan Voss — workstation  [IDS]",
+      { ip:"10.8.2.10", hostname:"voss-ws", label:"Alan Voss — workstation ",
         subnet:"10.8.2.0/24", ids:true, trace_seconds:75, hidden_fs:false, home:"/home/avoss",
         account:{user:"avoss", password:"SeaBreeze1998"},
         files:{
@@ -666,7 +680,7 @@ const CONTRACTS = [
   }
 },
 {
-  id:"atrium", name:"Open House", difficulty:"HIGH", payout:"₿1.8",
+  id:"atrium", name:"Open House", difficulty:"HIGH", payout:"₿45",
   tags:["MULTI-PAGE SITE","EMPLOYEE PORTAL","EXFIL"],
   desc:"Atrium Capital is closing a secret acquisition. The client wants the deal memo. Their website is your map — find the right employee, walk in through the staff portal, and pull the file from the partner's desk.",
   world:{
@@ -687,11 +701,13 @@ const CONTRACTS = [
       pet:{label:"Pet name", value:"Pixel", type:"cred"},
       yr:{label:"Birth year", value:"1994", type:"cred"},
       fmt:{label:"Email format", value:"[first-initial][last]@atriumcapital.com", type:"lead"},
-      sub:{label:"Office subnet", value:"10.12.0.0/24", type:"lead"}
+      sub:{label:"Office subnet", value:"10.12.0.0/24", type:"lead"},
+      dpet:{label:"D. Reyes pet (decoy)", value:"Biscuit", type:"cred"},
+      dyr:{label:"D. Reyes year (decoy)", value:"1990", type:"cred"}
     },
     machines:[
-      { ip:"10.12.0.8", hostname:"gpike-ws", label:"Gerald Pike — workstation  [IDS]",
-        subnet:"10.12.0.0/24", ids:true, trace_seconds:80, hidden_fs:false, home:"/home/gpike",
+      { ip:"10.12.0.8", hostname:"gpike-ws", label:"Gerald Pike — workstation ",
+        subnet:"10.12.0.0/24", ids:true, trace_seconds:55, hidden_fs:false, home:"/home/gpike",
         account:{user:"gpike", password:"At1as$Pike77"},
         files:{
           "/home/gpike/deals/project_atlas.pdf":"[PDF · 3.3MB] PROJECT ATLAS — acquisition terms, price, and timeline (CONFIDENTIAL).",
@@ -764,13 +780,20 @@ const CONTRACTS = [
           <div class="post">Monday motivation: survive on coffee, thrive on chaos. ☕</div>
           <div class="post">🐾 <b>Pixel</b> turned 5 today — spoiled rotten as always. Best little corgi in the world.</div>
           <div class="post">Birthday season 🎂 a '90s baby through and through — <b>1994</b> represent!</div>
-          <div class="post muted">Boss in back-to-back meetings again. Somebody send snacks.</div>` }
+          <div class="post muted">Boss in back-to-back meetings again. Somebody send snacks.</div>` },
+      "friendwall.onion/dana.reyes":{ discover:["dpet","dyr"],
+        keywords:"dana reyes atrium compliance officer personal social biscuit", title:"FriendWall — Dana R.",
+        html:`<h1>Dana R.</h1>
+          <div class="post">Compliance never sleeps. Neither do I, apparently. 🙃</div>
+          <div class="post">🐕 <b>Biscuit</b>'s vet bills could fund a small country but look at that face.</div>
+          <div class="post">Class of <b>1990</b> reunion this weekend — terrifying how fast it goes.</div>
+          <div class="post muted">Reminder: I do NOT have access to the partners' systems. Stop asking me, Greg.</div>` }
     }},
-    solution_path:["search atrium→site→/team (find Nina Cole, the EA)","search Nina→friendwall (Pixel+1994)","/careers→email format+subnet → ncole@atriumcapital.com","portal login ncole/Pixel1994","portal reveals gpike workstation creds+subnet","scan→connect gpike-ws→exfil project_atlas.pdf→disconnect"]
+    solution_path:["search atrium→site→/team (TWO women: Nina Cole=EA is the way in, Dana Reyes=Compliance is a decoy with no partner access)","search Nina→friendwall (Pixel+1994)","/careers→email format+subnet → ncole@atriumcapital.com","portal login ncole/Pixel1994","portal reveals gpike workstation creds+subnet","scan→connect gpike-ws→exfil project_atlas.pdf→disconnect before 55s trace"]
   }
 },
 {
-  id:"the-favour", name:"The Favour", difficulty:"MEDIUM", payout:"₿1.1",
+  id:"the-favour", name:"The Favour", difficulty:"MEDIUM", payout:"₿12",
   tags:["SINGLE TARGET","SOCIAL ENG.","LEAK"],
   desc:"A jittery client is certain his oldest friend is keeping a file on him — and might use it. He wants that file pulled and dropped to him, quietly. It's a personal laptop: no monitoring, no trace. But you'll have to read a man's whole life to guess his password.",
   world:{
@@ -925,35 +948,36 @@ const GLOBAL_WEB={
       <div style="line-height:2">
       · <a data-url="torch://search">TORCH</a> <span class="muted">— deep-index search. start a name here.</span><br>
       · <a data-url="thepit.onion">the pit</a> <span class="muted">— no names, no logs, no rules that matter.</span><br>
-      · <a data-url="thecellar.onion">the cellar</a> <span style="color:#7a3030">— you know what this is. don't.</span><br>
+      · <a data-url="thecellar.onion">the cellar</a><br>
       · <a data-url="deepfeed.onion">DeepFeed</a> <span class="muted">— breaches &amp; leaks. what they don't print.</span><br>
       · <a data-url="undermarket.onion">UnderMarket</a> <span class="muted">— data &amp; access. past its prime, still open.</span><br>
       · <a data-url="thescroll.onion">↓↓↓</a> <span class="muted">— keeps going. allegedly worth the trip.</span><br>
       · <a data-url="signalnoise.onion">SignalNoise</a> <span class="muted">— opsec board. dry, technical, useful.</span><br>
       · <a data-url="thevoidledger.onion">The Void Ledger</a> <span style="color:#43e07a">— online</span><br>
-      · <a data-url="meatmarket.onion">meatmarket</a> <span class="muted">— not what you're hoping it sells.</span><br>
+      · <a data-url="meatmarket.onion">meatmarket</a><br>
       · <a data-url="credbase.onion">CredBase</a> <span class="muted">— search an email. see what already leaked.</span><br>
       · <a data-url="freebitcoin-generator.onion">FREE BTC GENERATOR</a> <span class="muted">— free money. one click. surely.</span><br>
       · <a data-url="relaywatch.onion">RelayWatch</a> <span class="muted">— the relays aren't what they say they are.</span><br>
       · <a data-url="ghostmarket.onion">ghostmarket</a> <span style="color:#e0533f">— offline</span><br>
       · <a data-url="darkjobs.onion">DarkJobs</a> <span class="muted">— clients post, contractors bid. mind the scope.</span><br>
       · <a data-url="silent-contract.onion">Silent Contract</a> <span class="muted">— discreet resolution services. discretion guaranteed.</span><br>
+      · <a data-url="payloadmarket.onion">Payload Market</a> <span class="muted">— tools, exploits, gear. no data, no jobs. tested before listed.</span><br>
       · <a data-url="nightowl.onion">NightOwl</a> <span class="muted">— an insomniac's diary. oddly compelling.</span><br>
-      · <a data-url="thekillroom.onion">the kill room</a> <span style="color:#7a3030">— flagged. reported. still up. leave it.</span><br>
+      · <a data-url="thekillroom.onion">the kill room</a><br>
       · <a data-url="echochamber.onion">Echo Chamber</a> <span class="muted">— all conviction, no filter, some pigeons.</span><br>
       · <a data-url="truthprotocol.onion">TRUTH PROTOCOL</a> <span class="muted">— the manifesto. mirror it before it's gone.</span><br>
       · <a data-url="vaultdrop.onion">VaultDrop</a> <span class="muted">— dead drop. gone in 72 hours, no trace.</span><br>
-      · <a data-url="thebasement.onion">the basement</a> <span class="muted">— deeper than the cellar.</span><br>
+      · <a data-url="thebasement.onion">the basement</a><br>
       · <a data-url="coldclock.onion">ColdClock</a> <span class="muted">— opsec zine for people starting to care.</span><br>
       · <a data-url="congratulations-winner.onion">★ YOU WON ★</a> <span class="muted">— 1,000,000th visitor. claim now!!</span><br>
       · <a data-url="whistlehub.onion">WhistleHub</a> <span class="muted">— hand documents to people who print them.</span><br>
       · <a data-url="mixchain.onion">MixChain</a> <span style="color:#43e07a">— online</span> <span class="muted">— coins in, clean coins out.</span><br>
-      · <a data-url="feralcam.onion">feralcam</a> <span class="muted">— don't.</span><br>
+      · <a data-url="feralcam.onion">feralcam</a><br>
       · <a data-url="station-fifteen.onion">Station Fifteen</a> <span class="muted">— numbers. no operator. it does not reply.</span><br>
       · <a data-url="soliloquy.onion">Soliloquy</a> <span class="muted">— someone who left the work, writing it down.</span><br>
       · <a data-url="cipherbay.onion">cipherbay</a> <span style="color:#e0533f">— offline</span><br>
       · <a data-url="thelace.onion">THE LACE</a> <span class="muted">— string, corkboard, conviction. partly right.</span><br>
-      · <a data-url="the-quiet-place.onion">the quiet place</a> <span class="muted">— it isn't quiet.</span><br>
+      · <a data-url="the-quiet-place.onion">the quiet place</a><br>
       · <a data-url="theraft.onion">The Raft</a> <span class="muted">— small, slow, invite-only. be quiet in there.</span><br>
       · <a data-url="hello.onion">hi</a> <span class="muted">— that's the whole site. respect.</span><br>
       · <a data-url="oldforum-backup.onion">oldforum backup</a> <span style="color:#e0533f">— 503</span><br>
@@ -1593,7 +1617,8 @@ const GLOBAL_WEB={
 
   /* PURPOSE: meme — the tiniest possible site. */
   "hello.onion":{ title:"hi", keywords:"hi hello greeting tiny small page minimal",
-    html:`<h1>hi.</h1><p class="muted">that's the site. someone registered a hidden service for this. respect.</p>` }
+    html:`<h1>hi.</h1><p class="muted">that's the site. someone registered a hidden service for this. respect.</p>` },
+  "payloadmarket.onion":{ type:"shop", title:"Payload Market", keywords:"payload market shop tools exploits buy download crack scan decode wifi store" }
 };
 // the classic "YOU ARE AN IDIOT" gag — entirely in-page, downloads nothing, dismissable.
 let _idiotTimer=null;
@@ -1624,6 +1649,154 @@ function idiotVirus(){
   },28);
 }
 function siteMap(){ return Object.assign({}, GLOBAL_WEB, (W&&W.web&&W.web.sites)||{}); }
+
+/* ============================================================================
+   PAYLOAD MARKET — the tool shop (old-internet storefront, browser site)
+   ========================================================================== */
+const SHOP_ITEMS=[
+  // cat: access | recon | stealth | conn | crypto | endgame
+  { id:"hashcrack", name:"hashcrack", cat:"access", price:6, ver:"2.4", size:"512 KB",
+    desc:"Reverses hashed passwords pulled from a file, not just plaintext you read off a screen. Feed it a hash, get the word." },
+  { id:"smartlist", name:"smartlist", cat:"access", price:14, ver:"5.1", size:"1.2 MB",
+    desc:"A better mutation engine for your wordlist, and a faster runner.", bonus:["crack runs 3× faster","deeper wordlist mutations"] },
+  { id:"dirscan", name:"dirscan", cat:"access", price:18, ver:"1.9", size:"880 KB",
+    desc:"Brute-forces hidden paths on a host or a site — the directories nobody linked.", bonus:["new command: dirscan <host>"] },
+  { id:"0day", name:"0day pack", cat:"access", price:55, ver:"—", size:"44 KB", consumable:true, charges:3,
+    desc:"Three single-use bypasses. Skip a crack outright, or slip past one monitored login.", bonus:["new command: 0day <user>@<ip>","3 charges per pack"] },
+  { id:"nmap", name:"nmap", cat:"recon", price:16, ver:"7.9", size:"2.1 MB",
+    desc:"A real scan. Fingerprints the host and shows what a basic sweep walks past.", bonus:["scan shows IDS + services","reveals adjacent subnets"] },
+  { id:"aggregator", name:"aggregator", cat:"recon", price:10, ver:"3.0", size:"3.4 MB",
+    desc:"Cross-references the public record so a search comes back with more than one thread to pull.", bonus:["richer search results"] },
+  { id:"proxychains", name:"proxychains", cat:"stealth", price:16, ver:"4.16", size:"340 KB",
+    desc:"More hops between you and the host. Buys you time when the clock's running.", bonus:["+50% trace window"] },
+  { id:"logwiper", name:"logwiper", cat:"stealth", price:5, ver:"1.2", size:"96 KB",
+    desc:"Scrubs your session off a host before you drop it.", bonus:["new command: wipe-logs"] },
+  { id:"scraper", name:"bit-scraper", cat:"stealth", price:22, ver:"0.8", size:"210 KB",
+    desc:"Skims a cut off whatever you're already inside. The more you take, the louder you get.", bonus:["new command: scrape 1|2|3","+10/20/30% payout","trace runs hot — and it's loud"] },
+  { id:"wifi", name:"better wifi", cat:"conn", price:8, ver:"—", size:"hardware",
+    desc:"A cleaner uplink. Searches and pages stop crawling.", bonus:["faster searches & page loads"], physical:true },
+  { id:"line", name:"dedicated line", cat:"conn", price:60, ver:"—", size:"hardware",
+    desc:"Your own pipe. The relay barely slows you down anymore.", bonus:["near-instant browsing"], physical:true },
+  { id:"decode", name:"decode", cat:"crypto", price:20, ver:"2.0", size:"1.0 MB",
+    desc:"Throws encoded text at every common scheme until something reads back. Watch it work.", bonus:["new command: decode <text>"] },
+  { id:"keyblob", name:"private key blob", cat:"crypto", price:6, ver:"—", size:"4 KB",
+    desc:"A sealed private key. No listed use. Sold as-is." },
+  { id:"offtool", name:"offensive-relay toolkit", cat:"endgame", price:90, ver:"—", size:"6.6 MB",
+    desc:"Rewrites what the maintenance shell will let you do. Points the relay's own tools outward.",
+    locked:()=>true, lockReason:"requires: a live operator-relay foothold" }
+];
+const SHOP_CATS=[["access","Access"],["recon","Recon"],["stealth","Stealth"],["conn","Connection"],["crypto","Crypto"],["endgame","Restricted"]];
+function shopCatColor(c){ return {access:"#b03a2e",recon:"#1f5fa6",stealth:"#555",conn:"#0f7a6a",crypto:"#6a3fb0",endgame:"#7a3030"}[c]||"#555"; }
+
+function renderShop(){
+  const owned=PROGRESS.tools;
+  const item=(it)=>{
+    const isOwned=!it.consumable && owned.includes(it.id);
+    const locked=it.locked&&it.locked();
+    const afford=PROGRESS.balance>=it.price;
+    const charges=(PROGRESS.charges&&PROGRESS.charges[it.id])||0;
+    const btn = isOwned
+      ? `<span style="display:inline-block;background:#2e6b2e;color:#cfe;border:2px outset #4a8a4a;padding:3px 12px;font-weight:bold">INSTALLED</span>`
+      : locked
+      ? `<span style="display:inline-block;background:#5a2a2a;color:#e8b;border:2px outset #804040;padding:3px 12px">LOCKED</span>`
+      : `<button onclick="shopBuy('${it.id}')" style="background:#d0d0d0;border:2px outset #fff;padding:3px 14px;font-family:inherit;font-size:12px;cursor:pointer;font-weight:bold;color:#003">▼ Download</button>`
+        + (it.consumable&&charges?`<div style="color:#063;font-size:10px;margin-top:2px">owned: ${charges} charge(s)</div>`:'')
+        + (afford?'':`<div style="color:#a00;font-size:10px;margin-top:2px">insufficient ₿</div>`);
+    const bonus = it.bonus?`<div style="margin-top:4px">${it.bonus.map(b=>`<span style="background:#ffffcc;border:1px solid #cc9;color:#553;font-size:10px;padding:1px 5px;margin-right:4px;white-space:nowrap">★ ${esc(b)}</span>`).join('')}</div>`:'';
+    return `<tr style="border-bottom:1px solid #999">
+      <td style="padding:8px;vertical-align:top;width:54px;text-align:center">
+        <div style="width:42px;height:42px;margin:0 auto;background:${shopCatColor(it.cat)};border:2px outset #ccc;color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:bold">${esc(it.name[0].toUpperCase())}</div></td>
+      <td style="padding:8px;vertical-align:top">
+        <b style="color:#003;font-size:14px">${esc(it.name)}</b>
+        <span style="color:#777;font-size:10px">v${esc(it.ver)} · ${esc(it.size)} · ★★★★★</span>
+        <div style="color:#222;font-size:12px;margin-top:2px">${esc(it.desc)}</div>
+        ${locked?`<div style="color:#a00;font-size:10px;margin-top:3px">⚠ ${esc(it.lockReason)}</div>`:''}
+        ${bonus}</td>
+      <td style="padding:8px;vertical-align:top;text-align:right;white-space:nowrap">
+        <div style="color:#a60;font-weight:bold;font-size:15px">₿${it.price}</div>
+        <div style="margin-top:4px">${btn}</div></td></tr>`;
+  };
+  let html=`<div id="shopwrap" style="background:#c0c0c0;color:#000;font-family:Verdana,Geneva,sans-serif;border:3px outset #fff;margin:-2px">
+    <div style="background:linear-gradient(#3a3aa0,#1a1a60);color:#fff;padding:10px 12px;border-bottom:3px ridge #88a">
+      <div style="font-size:24px;font-weight:bold;letter-spacing:1px;text-shadow:1px 1px #000">★ PAYLOAD MARKET ★</div>
+      <marquee style="font-size:11px;color:#ffff99">·•· tooling for people who do the work ·•· est. 2016 ·•· 4.9 stars over 2,000 sales ·•· everything tested before it's listed ·•· buy once, it's yours ·•·</marquee></div>
+    <div style="background:#e8e8e8;border-bottom:1px solid #999;padding:6px 12px;font-size:12px;display:flex;justify-content:space-between;align-items:center">
+      <span>🔒 secure checkout · escrow protected · delivery to <b>~/tools</b></span>
+      <span style="background:#000;color:#0f0;font-family:monospace;padding:2px 8px;border:1px inset #888">BALANCE: ₿${(Math.round(PROGRESS.balance*100)/100)}</span></div>
+    <div style="padding:10px 12px;font-size:12px;background:#d4d4d4;border-bottom:1px solid #999">
+      Tools. Nothing else. No data, no people, no jobs — that's someone else's market. One-shots are marked. No refunds. Don't ask what to use it for.</div>`;
+  SHOP_CATS.forEach(([cat,label])=>{
+    const rows=SHOP_ITEMS.filter(i=>i.cat===cat);
+    if(!rows.length) return;
+    html+=`<div style="background:${shopCatColor(cat)};color:#fff;padding:4px 12px;font-weight:bold;font-size:12px;letter-spacing:1px;border-top:2px ridge #aaa">${esc(label)}</div>
+      <table style="width:100%;border-collapse:collapse;background:#e0e0e0">${rows.map(item).join('')}</table>`;
+  });
+  html+=`<div style="background:#e8e8e8;border-top:2px ridge #aaa;padding:8px 12px;font-size:10px;color:#666;text-align:center">
+    Delivery is instant, to ~/tools on your box. One-shots are marked; everything else is permanent. Escrow on every sale. No refunds.
+    <br>Restocks weekly · you are visitor 0048217 · © payloadmarket 2016–</div></div>`;
+  pageEl.className='page';
+  pageEl.innerHTML=html;
+}
+async function shopBuy(id){
+  const it=SHOP_ITEMS.find(x=>x.id===id); if(!it) return;
+  if(it.locked&&it.locked()) return;
+  if(!it.consumable && PROGRESS.tools.includes(id)) return;
+  if(PROGRESS.balance<it.price){ return; }   // button shows "insufficient ₿"; do nothing
+  await installAnim(it);
+  PROGRESS.balance-=it.price;
+  if(it.consumable){ PROGRESS.charges[id]=(PROGRESS.charges[id]||0)+(it.charges||1); }
+  else { PROGRESS.tools.push(id);
+    HOME.files['/root/tools/'+id]=`[${it.physical?'hardware':'tool'}] ${it.name} — installed from payloadmarket.`; }
+  saveProgress(); updateWallet(true); if(WIN.files) refreshFilesApp();
+  renderShop();
+}
+function installAnim(it){
+  return new Promise(resolve=>{
+    const ov=document.createElement('div');
+    ov.style.cssText='position:fixed;inset:0;z-index:9990;background:rgba(0,0,20,.5);display:flex;align-items:center;justify-content:center';
+    ov.innerHTML=`<div style="width:340px;background:#c0c0c0;border:3px outset #fff;font-family:Verdana,sans-serif;color:#000">
+      <div style="background:linear-gradient(#3a3aa0,#1a1a60);color:#fff;font-size:12px;font-weight:bold;padding:4px 8px">Downloading — payloadmarket</div>
+      <div style="padding:14px">
+        <div style="font-size:12px" class="ia-msg">connecting to payloadmarket…</div>
+        <div style="height:18px;border:2px inset #888;background:#fff;margin-top:8px;padding:1px"><div class="ia-bar" style="height:100%;width:0%;background:repeating-linear-gradient(90deg,#1a1a90,#1a1a90 8px,#3a3ac0 8px,#3a3ac0 16px)"></div></div>
+        <div class="ia-pct" style="font-size:11px;color:#444;margin-top:4px">0%</div>
+      </div></div>`;
+    document.body.appendChild(ov);
+    const bar=ov.querySelector('.ia-bar'), pct=ov.querySelector('.ia-pct'), msg=ov.querySelector('.ia-msg');
+    const file=(it.id+(it.physical?'.pkg':'.bin'));
+    const steps=[[15,`downloading ${file} …`],[45,`downloading ${file} …`],[70,'verifying signature …'],[90,'installing to ~/tools …'],[100,'done.']];
+    let i=0;
+    const tick=()=>{ if(i>=steps.length){ setTimeout(()=>{ ov.remove(); resolve(); },350); return; }
+      const [p,m]=steps[i++]; bar.style.width=p+'%'; pct.textContent=p+'%'; msg.textContent=m; setTimeout(tick,260+Math.random()*220); };
+    tick();
+  });
+}
+/* `decode` tool — auto-detects scheme and decodes, with a short animation in the terminal. */
+function decodeTry(raw){
+  const s=raw.trim();
+  if(/^[01][01\s]*[01]$/.test(s) && s.replace(/\s/g,'').length%8===0){
+    try{ const bytes=s.replace(/\s/g,'').match(/.{8}/g).map(b=>parseInt(b,2));
+      const t=String.fromCharCode(...bytes); if(/^[\x20-\x7e]+$/.test(t)) return ['binary',t]; }catch(e){} }
+  if(/^[0-9a-f][0-9a-f\s]*$/i.test(s) && s.replace(/\s/g,'').length%2===0 && s.replace(/\s/g,'').length>=4){
+    try{ const t=s.replace(/\s/g,'').match(/.{2}/g).map(h=>parseInt(h,16)).map(c=>String.fromCharCode(c)).join('');
+      if(/^[\x20-\x7e]+$/.test(t)) return ['hexadecimal',t]; }catch(e){} }
+  if(/^(\d{1,3})(\s+\d{1,3})+$/.test(s)){
+    try{ const t=s.split(/\s+/).map(n=>String.fromCharCode(+n)).join(''); if(/^[\x20-\x7e]+$/.test(t)) return ['decimal ascii',t]; }catch(e){} }
+  if(/^[A-Za-z0-9+/]+={0,2}$/.test(s) && s.length%4===0 && s.length>=8){
+    try{ const t=atob(s); if(/^[\x20-\x7e]+$/.test(t)) return ['base64',t]; }catch(e){} }
+  if(/^[.\-/ ]+$/.test(s)){
+    const M={'.-':'a','-...':'b','-.-.':'c','-..':'d','.':'e','..-.':'f','--.':'g','....':'h','..':'i','.---':'j','-.-':'k','.-..':'l','--':'m','-.':'n','---':'o','.--.':'p','--.-':'q','.-.':'r','...':'s','-':'t','..-':'u','...-':'v','.--':'w','-..-':'x','-.--':'y','--..':'z'};
+    const t=s.trim().split(/\s+/).map(c=>M[c]||'?').join(''); if(!/\?/.test(t)) return ['morse',t]; }
+  return [null,null];
+}
+async function decodeAnim(raw){
+  await typeLine("decode: analysing input ...","c-dim",4); await sleep(260);
+  const [scheme,out]=decodeTry(raw);
+  if(!scheme){ line("  no known scheme matched. it may be encrypted (needs a key), corrupted, or already plaintext.","c-amber"); return; }
+  await typeLine(`  detected: ${scheme}`,"c-cyan",4); await sleep(180);
+  await typeLine("  decoding ...","c-dim",4); await sleep(300);
+  line(`  ► ${out}`,"c-white");
+}
 
 /* ---- settings ---- */
 const SETTINGS_DEFS=[
@@ -1728,6 +1901,7 @@ function resetState(){
   S.discovered=new Set(); S.wordlist=null; S.cracked=new Set();
   S.conn=null; S.cwd=HOME.home; S.knownSubnets=new Set(); S.foundCreds={};
   S.seeds=[]; S.auth=new Set(); S.loud=new Set(); S.exfilDone=false; S.objComplete=false; S.done=false;
+  S.scrapeLevel=0;
   stopTrace();
 }
 function activeHost(){ return S.conn ? W.machines.find(m=>m.ip===S.conn) : HOME; }
@@ -1793,7 +1967,9 @@ async function loadAndRender(entry){
   const g=++loadGen; if(urlBar) urlBar.value=entry.url;
   const site=siteMap()[entry.url];
   if(SETTINGS.loaddelay && site){                 // delay ALL loads, search included
-    const d=800+Math.random()*2000;               // longer — like bad Tor routing
+    let d=5000+Math.random()*3000;                // ~5–8s — deliberately painful (makes a connection upgrade worth buying)
+    if(ownsTool('line')) d*=0.12;                  // dedicated line — near-instant
+    else if(ownsTool('wifi')) d*=0.45;             // better wifi — noticeably faster
     showLoading(entry.url); startLoadbar(d);
     await sleep(d);
     if(g!==loadGen) return;                        // a newer load owns the bar now — bail
@@ -1867,6 +2043,7 @@ function render(entry){
   if(site.discover && W) site.discover.forEach(discover);
   if(site.type==="search") renderSearch(entry.q);
   else if(site.type==="service") renderService(entry.url);
+  else if(site.type==="shop") renderShop();
   else pageEl.innerHTML=site.html;
   updateNav(); renderTabs();
 }
@@ -2054,6 +2231,7 @@ function applyServiceOpen(s){
 
 /* ---- trace ---- */
 function startTrace(sec){
+  if(ownsTool('proxychains')) sec=Math.round(sec*1.5);   // proxychains buys you time
   S.trace=sec; if(traceEl){ traceEl.classList.add('live'); }
   paintTrace();
   S.traceTimer=setInterval(()=>{ S.trace--; paintTrace(); if(S.trace<=0){ clearInterval(S.traceTimer); caught(); } },1000);
@@ -2108,6 +2286,11 @@ const CMD={
      ["whois <domain>","look up who's behind a site before you trust it"],
      ["disconnect","drop the session (or shake a trace on your own relay)"]
     ].forEach(([c,d])=>p(`  <b>${esc(c)}</b><span class="c-dim"> — ${esc(d)}</span>`));
+    const toolCmds=[];
+    if(ownsTool('nmap')) toolCmds.push("nmap"); if(ownsTool('dirscan')) toolCmds.push("dirscan <host>");
+    if(ownsTool('decode')) toolCmds.push("decode <text>"); if(ownsTool('logwiper')) toolCmds.push("wipe-logs");
+    if(ownsTool('scraper')) toolCmds.push("scrape 1|2|3"); if((PROGRESS.charges&&PROGRESS.charges['0day'])>0) toolCmds.push("0day <user>@<ip>");
+    if(toolCmds.length) line(`  installed tools: ${toolCmds.join(' · ')}`,'c-cyan');
     line("  → type `help 2` for system / shell commands.","c-dim");
   },
   mission(){ renderDossier(); W.mission.briefing.forEach(l=>line("  "+l,'c-amber')); },
@@ -2132,7 +2315,72 @@ const CMD={
     if(!visible.length){ line("no reachable hosts — you don't know any live subnets yet.","c-dim");
       line("recon the org for a subnet, or get a foothold and scan again.","c-dim"); return; }
     line(`scanning ${[...S.knownSubnets].join(', ')} ...`,'c-dim');
-    visible.forEach(m=>p(`  <span class="c-white">${m.ip}</span>  <b>${m.hostname}</b>${m.ids?' <span class="c-red">[IDS]</span>':''} <span class="c-dim">— ${esc(m.label)}</span>`));
+    // basic scan does NOT reveal IDS — you find out the hard way, or pay for `nmap`.
+    visible.forEach(m=>p(`  <span class="c-white">${m.ip}</span>  <b>${m.hostname}</b> <span class="c-dim">— ${esc(m.label)}</span>`));
+  },
+
+  /* ---- bought tools (payloadmarket). each behaves as "not installed" until owned. ---- */
+  nmap(arg){
+    if(!ownsTool('nmap')){ line("nmap: command not found. (buy it from payloadmarket.onion)","c-amber"); return; }
+    if(!W){ line("no active contract.","c-amber"); return; }
+    const visible=W.machines.filter(m=>S.knownSubnets.has(m.subnet));
+    if(!visible.length){ line("nmap: no reachable hosts on a known subnet.","c-dim"); return; }
+    const ports=["22/tcp ssh","80/tcp http","139/tcp netbios","445/tcp smb","3389/tcp rdp"];
+    line(`nmap — deep scan of ${[...S.knownSubnets].join(', ')} ...`,'c-dim');
+    visible.forEach(m=>{ const ps=ports.slice(0,2+(hashStr(m.ip)%3));
+      p(`  <span class="c-white">${m.ip}</span> <b>${m.hostname}</b>${m.ids?' <span class="c-red">[IDS — connecting loud gets you traced]</span>':' <span class="c-cyan">[no IDS]</span>'}`);
+      p(`     <span class="c-dim">open: ${ps.join(', ')}</span>`);
+      if(m.reveals_subnet) p(`     <span class="c-cyan">routes to ${m.reveals_subnet}</span>`);
+    });
+  },
+  dirscan(arg){
+    if(!ownsTool('dirscan')){ line("dirscan: command not found. (buy it from payloadmarket.onion)","c-amber"); return; }
+    if(!arg){ line("usage: dirscan <host>","c-dim"); return; }
+    const host=arg.replace(/^\w+:\/\//,'').split('/')[0].toLowerCase();
+    const map=siteMap();
+    const hits=Object.keys(map).filter(u=>u.toLowerCase().startsWith(host+'/'));
+    line(`dirscan ${host} — brute-forcing common paths ...`,'c-dim');
+    if(hits.length){ hits.forEach(u=>p(`  <span class="c-cyan">/${esc(u.slice(host.length+1))}</span> <span class="c-dim">200 OK</span>`));
+      line(`  ${hits.length} path(s) found. open them in the browser.`,'c-dim'); }
+    else line("  no hidden paths responded. this host hides nothing — or nothing you can reach.","c-amber");
+  },
+  decode(arg){
+    if(!ownsTool('decode')){ line("decode: command not found. (buy it from payloadmarket.onion)","c-amber"); return; }
+    if(!arg){ line("usage: decode <text>   (auto-detects binary / hex / base64 / decimal)","c-dim"); return; }
+    return decodeAnim(arg);
+  },
+  'wipe-logs'(){
+    if(!ownsTool('logwiper')){ line("wipe-logs: command not found. (buy logwiper from payloadmarket.onion)","c-amber"); return; }
+    if(!S.conn){ line("not connected — nothing to wipe here.","c-dim"); return; }
+    S.logsWiped=true; line("scrubbing session logs on this host ...","c-dim");
+    line("  access logs cleared. as far as this box knows, you were never here.","c-cyan");
+  },
+  scrape(arg){
+    if(!ownsTool('scraper')){ line("scrape: command not found. (buy bit-scraper from payloadmarket.onion)","c-amber"); return; }
+    if(!S.conn){ line("scrape: get into a host first — you skim from where you already are.","c-amber"); return; }
+    const lvl=parseInt(arg,10);
+    if(!(lvl>=1&&lvl<=3)){ line("usage: scrape 1|2|3   (1=+10%, 2=+20%, 3=+30% payout — but louder)","c-dim"); return; }
+    S.scrapeLevel=lvl;
+    line(`skimming at level ${lvl} — payout +${lvl*10}% on this job.`,'c-amber');
+    // greed is loud: starts a trace if none, or burns the window you've got
+    const m=activeHost();
+    if(S.trace==null){ line("  the skim is noisy — you've drawn a trace.","c-red"); startTrace(Math.max(20, (m&&m.trace_seconds)||45)); }
+    else { S.trace=Math.max(5, Math.round(S.trace*(1-lvl*0.2))); paintTrace(); line(`  and you just burned your window down to ${S.trace}s.`,"c-red"); }
+  },
+  '0day'(arg){
+    const charges=(PROGRESS.charges&&PROGRESS.charges['0day'])||0;
+    if(charges<=0){ line("0day: no charges. (buy a 0day pack from payloadmarket.onion)","c-amber"); return; }
+    if(!arg||!arg.includes('@')){ line("usage: 0day <user>@<ip>   (burns one charge — clean, no trace)","c-dim"); return; }
+    if(!W){ line("no active contract.","c-amber"); return; }
+    const [user,ip]=arg.split('@'); const m=W.machines.find(x=>x.ip===ip);
+    if(!m){ line(`no host at ${ip}.`,'c-amber'); return; }
+    if(user!==m.account.user){ line(`0day: no such user '${user}' on ${m.hostname}.`,'c-amber'); return; }
+    PROGRESS.charges['0day']=charges-1; saveProgress();
+    S.loud.delete(`${user}@${ip}`);   // 0day is CLEAN — connecting won't be traced
+    line(`deploying 0day against ${user}@${ip} ...`,'c-dim');
+    line(`  bypass successful. password: ${m.account.password}`,'c-cyan');
+    line(`  clean — no flag raised. connect ${user}@${ip} ${m.account.password}`,'c-dim');
+    line(`  0day charges left: ${PROGRESS.charges['0day']}`,'c-dim');
   },
   wordlist(arg){
     const parts=(arg||'').split(/\s+/).filter(Boolean);
@@ -2144,10 +2392,13 @@ const CMD={
       if(!facts.length){ line("no password clues yet — those come from personal life, not the network.","c-amber"); return; } }
     else { facts=[...new Set(S.seeds)]; if(!facts.length){ line("no seeds — read the pages, then `wordlist add <word>`.","c-amber"); return; } }
     const list=new Set(); const caps=s=>s.charAt(0).toUpperCase()+s.slice(1);
+    const deep=ownsTool('smartlist'); const leet=s=>s.replace(/a/gi,'4').replace(/e/gi,'3').replace(/o/gi,'0').replace(/i/gi,'1');
     for(const a of facts){ list.add(a); list.add(caps(a));
-      for(const b of facts){ if(a!==b){ list.add(caps(a)+b); list.add(a+b); list.add(caps(a)+"!"); } } }
+      for(const b of facts){ if(a!==b){ list.add(caps(a)+b); list.add(a+b); list.add(caps(a)+"!"); } }
+      if(deep){ list.add(a+"!"); list.add(a+"123"); list.add(caps(a)+"123"); list.add(leet(a)); list.add(caps(a)+"@"); list.add(a+"2024");
+        for(const b of facts){ if(a!==b){ list.add(a+"."+b); list.add(caps(a)+b+"!"); list.add(leet(caps(a)+b)); } } } }
     S.wordlist=[...list];
-    line(`generated ${S.wordlist.length} candidates from ${facts.length} clues:`,'c-dim');
+    line(`generated ${S.wordlist.length} candidates from ${facts.length} clues${deep?' (smartlist: deep mutations)':''}:`,'c-dim');
     p(`  <span class="c-dim">${esc(S.wordlist.slice(0,12).join('  '))} ...</span>`);
   },
   crack(arg){
@@ -2386,8 +2637,9 @@ async function crackAnim(m,user,ip){
   await typeLine(`crack: dictionary attack on ${user}@${ip} (wordlist: common.txt, 5000 entries)`,'c-dim',3);
   const found = hit ? 200+Math.floor(Math.random()*4400) : 5000;   // where in the 5000 it "hits"
   const d=document.createElement('div'); d.className='c-dim'; out.appendChild(d);
-  let i=0; const step=Math.max(20,Math.round(found/45));
-  while(i<found){ i=Math.min(found,i+step); d.textContent=`  ${String(i).padStart(4)}/5000   ${fakePw()}`; out.scrollTop=out.scrollHeight; await sleep(30); }
+  const fast=ownsTool('smartlist'); const dly=fast?12:30; const step=Math.max(20,Math.round(found/(fast?80:45)));
+  let i=0;
+  while(i<found){ i=Math.min(found,i+step); d.textContent=`  ${String(i).padStart(4)}/5000   ${fakePw()}`; out.scrollTop=out.scrollHeight; await sleep(dly); }
   if(hit){
     d.textContent=`  ${found}/5000   match`;
     S.loud.add(`${user}@${ip}`);   // crack = loud → connecting afterward is traced on IDS hosts
@@ -2401,17 +2653,21 @@ async function crackAnim(m,user,ip){
 }
 function win(){ S.done=true; stopTrace();
   const paid=activeContract && !PROGRESS.completed.includes(activeContract.id);
+  S.conn=null; S.cwd=HOME.home; updatePrompt();   // back on your own box
   line(""); line("════════════════════════════════════════════","c-cyan");
   line(" CONTRACT COMPLETE — clean exit, no trace.","c-cyan");
   line(` ${W.mission.target_name} will never know it was here.`,"c-cyan");
   if(activeContract && paid){
-    awardPayout(activeContract);
+    const bonus=awardPayout(activeContract);
     line(` payment cleared: ${activeContract.payout}  ·  balance ${fmtBtc(PROGRESS.balance)}`,"c-amber");
+    if(bonus>0) line(` + scraped ${fmtBtc(bonus)} on the side (+${(S.scrapeLevel*10)}%).`,"c-amber");
   } else if(activeContract){
     line(` (replay — already paid for "${activeContract.name}")`,"c-dim");
   }
   line("════════════════════════════════════════════","c-cyan");
-  line("Open Contracts (taskbar ▣) for the next job.","c-dim"); lockInput();
+  // do NOT lock the terminal — you can keep browsing / using your box, or take another job when you want.
+  line("You're back on your own box. Poke around, browse, or open Contracts (▣) for the next job.","c-dim");
+  if(cmd){ cmd.disabled=false; cmd.placeholder=''; cmd.focus&&cmd.focus(); }
 }
 
 function renderDossier(){
@@ -2810,17 +3066,15 @@ async function maintenanceShell(){
           echo('<span style="color:#7d8a7f">scanning relay mesh — enumerating reachable nodes ...</span>');
           await sleep(260);
           const n=180+Math.floor(Math.random()*200);             // a few hundred
-          const ips=['185.220.101.99']; const seen=new Set(ips);  // node [0001] = the upstream from relay.conf
-          while(ips.length<n){ const ip=randRelayIP(); if(!seen.has(ip)){ seen.add(ip); ips.push(ip); } }
+          const ips=[]; const seen=new Set(['185.220.101.99']);   // reserve the operator addr so it isn't duplicated
+          while(ips.length<n-1){ const ip=randRelayIP(); if(!seen.has(ip)){ seen.add(ip); ips.push(ip); } }
+          ips.splice(Math.floor(Math.random()*10),0,'185.220.101.99');  // hide it among the first 10, UNLABELLED
           echo('<span style="color:#7d8a7f">  NODE     ADDRESS             ROLE</span>');
           let rows='';
           ips.forEach((ip,i)=>{ const id='['+String(i+1).padStart(4,'0')+']';
-            rows += (i===0)
-              ? `  <span style="color:var(--amber)">${id}   ${ip.padEnd(18)}▸ upstream · operator</span>\n`
-              : `  ${id}   ${ip.padEnd(18)}transit\n`;
-          });
+            rows += `  ${id}   ${ip.padEnd(18)}transit\n`; });
           echo('<span style="color:#8fb89c;font-size:12px">'+rows.trimEnd()+'</span>');
-          echo(`<span style="color:var(--amber)">${n} nodes reachable. every circuit reports to node [0001] — cross-check relay.conf.</span>`);
+          echo(`<span style="color:var(--amber)">${n} nodes reachable.</span>`);
           b.scrollTop=b.scrollHeight; break;
         }
         case 'clear': log.innerHTML=''; break;

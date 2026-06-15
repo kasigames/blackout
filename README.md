@@ -1,6 +1,6 @@
 # BLACKOUT
 
-**A hacking-contract game.** v0.7.0
+**A hacking-contract game.** v0.8.0
 
 You're a hacker-for-hire who takes contracts: do OSINT recon in a deep-web browser,
 social-engineer or pivot your way to a target's credentials, access their machine via a
