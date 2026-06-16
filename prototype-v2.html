@@ -1071,6 +1071,8 @@ const GLOBAL_WEB={
       · <a data-url="mixchain.onion">MixChain</a> <span style="color:#43e07a">— online</span> <span class="muted">— coins in, clean coins out.</span><br>
       · <a data-url="feralcam.onion">feralcam</a><br>
       · <a data-url="station-fifteen.onion">Station Fifteen</a> <span class="muted">— numbers. no operator. it does not reply.</span><br>
+      · <a data-url="themillenniumpost.onion">The Millennium Post</a> <span class="muted">— archived headlines, 1999–2009. where old news goes to die.</span><br>
+      · <a data-url="static-dump.onion">▒▒ static ▒▒</a> <span class="muted">— a recovered buffer, mostly gone. where the signal turns to static.</span><br>
       · <a data-url="soliloquy.onion">Soliloquy</a> <span class="muted">— someone who left the work, writing it down.</span><br>
       · <a data-url="cipherbay.onion">cipherbay</a> <span style="color:#e0533f">— offline</span><br>
       · <a data-url="thelace.onion">THE LACE</a> <span class="muted">— string, corkboard, conviction. partly right.</span><br>
@@ -1141,6 +1143,10 @@ const GLOBAL_WEB={
       <div class="post"><b>older</b><br>Reminder to self: the things you put online don't decay. They just wait.</div>` },
   "thepit.onion":{ title:"the pit // board", keywords:"the pit board forum chat imageboard threads anonymous",
     html:`<h1>the pit</h1><div class="muted">no names. no logs. no rules that matter.</div>
+      <div class="card"><b>>> dead drop, last third, don't ask</b><br>
+        <span class="muted">anon: <span style="font-family:monospace">[3 - 45]</span></span><br>
+        <span class="muted">anon: the other two are where old news goes to die and where the signal turns to static.</span><br>
+        <span class="muted">anon: append nothing. just the three numbers, in order.</span></div>
       <div class="card"><b>>> anyone else getting weird relay timeouts tonight?</b><br>
         <span class="muted">anon: yeah. three hops then nothing. blackout's been flaky all week.</span><br>
         <span class="muted">anon: it's not flaky. it's listening. wake up.</span><br>
@@ -1715,7 +1721,208 @@ const GLOBAL_WEB={
   /* PURPOSE: meme — the tiniest possible site. */
   "hello.onion":{ title:"hi", keywords:"hi hello greeting tiny small page minimal",
     html:`<h1>hi.</h1><p class="muted">that's the site. someone registered a hidden service for this. respect.</p>` },
-  "payloadmarket.onion":{ type:"shop", title:"Payload Market", keywords:"payload market shop tools exploits buy download crack scan decode wifi store" }
+  "payloadmarket.onion":{ type:"shop", title:"Payload Market", keywords:"payload market shop tools exploits buy download crack scan decode wifi store" },
+
+  /* ── the first r/h room — reachable ONLY by assembling the IP from 3 fragments. white page, black text,
+     old-net plain style, recovered intercept (irregular spacing = partial decryption). ── */
+  "91.219.237.45":{ title:"relay345-c", keywords:"",
+    html:`<div style="background:#fbfbf7;color:#111;font-family:'Courier New',monospace;font-size:13px;line-height:1.55;padding:16px;border:1px solid #ccc"><pre style="margin:0;white-space:pre-wrap;color:#111;font-family:inherit">relay345-c
+
+  intercept :: relay345-c
+  capture   :: passive · mid-session join (start not recovered)
+  decrypt   :: partial — 73.4% clean · 26.6% unrecoverable
+  //34//2//4///2///5//█//2///##//23//4/  ████  //2//#// 7f█2 //█
+
+  user [25] | exit node: 196.███.███.██ | "r" ... ... connected
+  user [4]  | exit node: 165.███.███.██ | "h" ... ... ... failed connection ... trying again ... connected
+
+          r: hello
+
+                    h: a board that looks like 1996. no css, no scripts, flat text. you still run everything like it's the old net.
+
+                              r: nothing to exploit in a dumb flat page. no scripts, no payload. it's the safest fucking room either of us will ever stand in. perfectly acceptable.
+
+        h: fine. code.
+
+                                  r: 9F2-K7X-Lp4Q.
+
+              h: 4T8-2█X-99Z.
+
+                      r: yeah. it's you. can we move.
+
+  h: we have never spoken without a code in twenty years and tonight you want to skip it. that already tells me something. what do you want, r.
+
+            r: help.
+
+                              h: you don't ask for help. you show up three moves deep and tell the rest of us to keep up.
+
+      r: times change.
+
+                    h: people change. times keep score. say it.
+
+  ... connection volatile
+  ... rerouting through 4 relays
+  ... reconnected
+
+              r: i've got a lead. on the founder.
+
+  h: the founder has been anon since 2002. no name, no face, no body. the people who go looking stop posting. you don't have a lead, you have a death wish you want to share.
+
+                          r: i forced an update to BLACKOUT's relay system.
+
+        h: ...
+
+        h: that isn't possible. the private updating software is signed and airgapped at the source. even on the ████████ relay — the one they sell for "commercial privacy" — nobody alters it. you don't force it. you pray it likes you.
+
+                  r: well i forced the fucker. signed, airgapped, didn't give a single shit. now sit down.
+
+  ... connection volatile
+  ... packet loss 38%
+  ... ███ unrecovered ███
+  [ 3 lines unrecoverable ]
+  ... reconnected
+
+                              h: did you see that drop.
+
+            r: it's a relay. it drops.
+
+  h: it drops harder when we use the word. say his name, say the project, the line gets sick. i have watched it for years.
+
+                        r: superstition.
+
+  h: i'm still here. that isn't unrelated to the superstition.
+
+        r: the relays are stitched across continents. one dies, the traffic re-weaves through the rest. you don't kill it by killing a node.
+
+                              h: common knowledge.
+
+  r: 2015. feds found a real operator relay — not a transit dummy — in a ████ in ohio.
+
+                  h: they held it for a day.
+
+                          r: less. founder wiped it remotely while their people were still in the room. down to the firmware. and it was sitting inside a CIA blacksite — ████. he reached into a building that does not officially exist and pulled the drives before they got one image off them.
+
+      h: ████████
+
+  h: then he had a route that survived a federal seizure inside a blacksite. that is not a hacker. that is infrastructure.
+
+                    r: he BUILT for it. after ohio he stopped trusting the operator relays to stay up, so he put a back door where nobody armors anything —
+
+  ... connection volatile
+  ... handshake renegotiated
+  ... reconnected
+
+              r: an admin portal. on the TORCH browser itself. the thing a billion people open every day. live since ohio. seize every operator relay on earth and he still has the keys, because the keys were never on the relays.
+
+  h: that is elegant. the master switch hidden in the one place everyone walks past.
+
+                                r: and here's the part that'll piss you off. the dashboard? same IP as one of the first ten relays. he parked the throne in the spine of his own network. you'd scan straight past it a hundred times.
+
+        h: ...you found which one.
+
+                        r: i found which one.
+
+  h: and the login.
+
+                  r: you'll fucking love this. user █████. password ████████.
+
+  h: no.
+
+                              r: yeah.
+
+  h: he pulls a relay out of a blacksite and leaves the front door on ████████.
+
+            r: arrogance. nobody tries the obvious thing because it's too stupid to be the door. so i tried the stupid fucking door and it opened.
+
+      h: ...and then.
+
+                    r: then i was in the maintenance shell. didn't just look — put my own commands back there. quiet ones. mine. and with those i reached it. the main operator relay. the one the others answer to.
+
+  h: you rewrote the shell every operator on the planet boots into.
+
+                          r: yeah.
+
+  h: tell me you wrote none of this down anywhere it can be read.
+
+            r: i'm not a fucking amateur.
+
+  ... connection volatile
+  ... packet loss 51%
+  ... rerouting through 7 relays
+  ... reconnected
+  ... exit node changed: 165.███.███.██ → 2█.███.███.██
+
+                                  r: times up. shit. that's it, we're done — now.
+
+        h: i didn't move my exit node.
+
+  r: i know you fucking didn't. that wasn't routing, that was a hand on the line. somebody's leaning on this room.
+
+                    h: you keep saying "reach the operator" like there's a person at the far end. what if the thing routing us is the thing we're hunting.
+
+                              r: then it heard all of that and we move this second. there's another room. real code, none of this plaintext. i'm not saying the address out loud.
+
+  h: then how.
+
+            r: split it. you've already got half — you logged it when i ██████-███ a minute ago. back third of my handshake string is the front of the door.
+
+                          r: back half waits in the second room. assemble it there.
+
+  h: and the second room.
+
+      r: append the obvious thing. founder always hides the real door one step past where people quit looking.   /█████
+
+  ... r disconnected
+  ... h disconnected
+  ... session ends
+  ████████  end of recovered capture — 26.6% unrecoverable  ████████</pre></div>` },
+
+  /* fragment carrier 1 — old 2000s news, old serif look. holds [1 - 91.219] */
+  "themillenniumpost.onion":{ title:"The Millennium Post — archive", keywords:"millennium post news archive 2000s headlines old news classifieds",
+    html:`<div style="background:#f4f1e8;color:#1a1a1a;font-family:Georgia,'Times New Roman',serif;padding:14px;border:1px solid #b8b09a">
+      <div style="border-bottom:3px double #1a1a1a;margin-bottom:8px"><h1 style="font-family:Georgia,serif;color:#1a1a1a;letter-spacing:1px;margin:.1em 0">The Millennium Post</h1>
+      <div style="font-size:11px;font-style:italic">Archived edition · "All the news that fit." · est. 1999</div></div>
+      <div style="font-size:13px;line-height:1.5">
+      <p><b>· Y2K passes without the predicted collapse; planners quietly relieved (Jan 1, 2000)</b></p>
+      <p><b>· Dot-com valuations wobble as investors ask where the profits are (Mar 2000)</b></p>
+      <p><b>· Napster ordered to filter copyrighted songs from its network (Mar 2001)</b></p>
+      <p><b>· Wikipedia launches; "anyone can edit" called either genius or madness (Jan 2001)</b></p>
+      <p><b>· iPod unveiled — "1,000 songs in your pocket" (Oct 2001)</b></p>
+      <p><b>· Broadband overtakes dial-up in major cities; the web gets faster (2002)</b></p>
+      <p><b>· A small encryption mailing list argues about "relay-of-relays" anonymity (2002)</b></p>
+      <p><b>· Friendster, then MySpace: the social web finds its feet (2003)</b></p>
+      <p><b>· "Web 2.0" enters the vocabulary; everyone pretends to know what it means (2004)</b></p>
+      <p><b>· YouTube's first upload: eighteen seconds at the zoo (Apr 2005)</b></p>
+      <p><b>· Anonymous routing tools go mainstream among journalists and dissidents (2006)</b></p>
+      <p><b>· The first iPhone; the web leaves the desk for good (2007)</b></p>
+      <p><b>· A financial crisis no one's website predicted (2008)</b></p>
+      <p><b>· "The cloud" sells you back the computers you used to own (2009)</b></p>
+      <p><b>· Quietly, a privacy project called BLACKOUT posts its first public build (2009)</b></p>
+      </div>
+      <div style="border-top:1px solid #b8b09a;margin-top:10px;padding-top:6px;font-size:11px;color:#555">
+        CLASSIFIEDS · personals · ciphers — <span style="font-family:monospace;color:#1a1a1a">[1 - 91.219]</span> · (the rest is elsewhere. you know the drill.)</div></div>` },
+
+  /* fragment carrier 2 — a corrupted dump made of the source text. long, garbled. holds [2 - 237] */
+  "static-dump.onion":{ title:"▒▒ static ▒▒", keywords:"static dump corrupted garbled noise recovered fragment source raw",
+    html:`<div style="background:#0a0a0a;color:#6f6;font-family:monospace;font-size:12px;line-height:1.5;padding:14px">
+      <div class="muted" style="color:#585">recovered buffer · 31% legible · the rest is gone</div><pre style="white-space:pre-wrap;color:#7c7;margin:8px 0">r: hel▒o ███ h: a bo█rd that looks li██ 1996 ▒▒▒ no css no scr█pts
+██ nothing to expl█it in a d██b flat p█ge ▒▒▒▒ saf██t room either of us
+will ever █tand in ███ h: fine. c█de ▒▒ 9F2-K7█-Lp4Q ▒▒▒ 4T8-2█X-9█Z
+███ times ch█nge ▒▒ people ch█nge times k██p score say it ████████
+i've got a l█ad. on the f█under ▒▒▒ anon si██e 2002 no name no f██e
+██ i forced an upd█te to BLAC████'s relay sys██m ▒▒▒▒ signed airg█pped
+you don't fo██e it you pr█y it likes ███ ▒▒ it dr█ps harder when we
+use the w█rd ███ say his n██e the line gets s██k ▒▒▒▒▒ 2015 ohio
+█ real oper█tor relay in a ████ ▒▒ founder wi██d it remot█ly down to
+the firm█are ███ inside a CIA bl█cksite ▒▒▒▒ an ad██n portal on the
+TORCH br█wser itself ███ live si██e ohio ▒▒ same IP as one of the
+first t█n relays ███ user █████ pass█ord ████████ ▒▒▒▒ i tried the
+stupid f█cking door and it op█ned ███ the main oper█tor relay ▒▒▒▒▒
+█ rewrote the sh██l every oper█tor boots into ███ that wasn't rout█ng
+that was a h█nd on the l██e ▒▒▒▒ what if the thing rout█ng us is the
+thing we're hun██ng ███ there's anoth█r room real c█de ▒▒▒▒▒▒▒▒
+append the ob██ous thing one st█p past where people q█it looking
+█████████ frag ▒▒ [2 - 237] ▒▒ █████████ end of legible buffer ███</pre></div>` }
 };
 // the classic "YOU ARE AN IDIOT" gag — entirely in-page, downloads nothing, dismissable.
 let _idiotTimer=null;
