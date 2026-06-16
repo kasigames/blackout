@@ -1599,7 +1599,7 @@ const GLOBAL_WEB={
       <p style="color:#0ff">Exploit the blockchain with ONE CLICK. Our generator mines <b>0.5 BTC</b> straight to your wallet.
       100% undetectable. As seen on the deep web. Limited slots remaining!!</p>
       <p style="color:#fff;font-size:12px">Last payout: 2 minutes ago to user <b>xX_richguy_Xx</b> · 14,209 satisfied users</p>
-      <button class="btn" style="background:#ff00ff;color:#fff;font-size:15px;padding:10px 22px" onclick="idiotVirus()">⬇ DOWNLOAD btc_generator_v9.exe (1.2 MB)</button>
+      <button class="btn" style="background:#ff00ff;color:#fff;font-size:15px;padding:10px 22px" onclick="downloadFile('btc_generator_v9.exe',1.2,idiotVirus)">⬇ DOWNLOAD btc_generator_v9.exe (1.2 MB)</button>
       <p style="color:#888;font-size:10px;margin-top:10px">No registration required. Instant download. Compatible with all wallets.</p></div>` },
 
   /* PURPOSE: meme / easter egg — reward for scrolling a very long nothing. */
@@ -1857,13 +1857,15 @@ const GLOBAL_WEB={
       <p style="font-size:20px;font-weight:bold;margin:18px 0 3px">First video uploaded: eighteen seconds at the zoo</p>
       <p style="font-size:14px;margin:0 0 16px">Apr 2005 — It is not much. It is also the beginning of everything that comes after.</p>
       <p style="font-size:20px;font-weight:bold;margin:18px 0 3px">Anonymous routing goes mainstream</p>
-      <p style="font-size:14px;margin:0 0 16px">2006 — Journalists and dissidents adopt onion-routing tools in numbers. In the back pages that week, wedged into the agony column and never explained, an unsigned line reads only "91.219" — the typesetter assumed an error and left it. Privacy, it turns out, is about to become a movement, and movements leave strange marks in the margins.</p>
+      <p style="font-size:14px;margin:0 0 16px">2006 — Journalists and dissidents adopt onion-routing tools in numbers. In the back pages that week, wedged into the agony column and never explained, an unsigned classified runs a single cipher — <span style="font-family:'Courier New',monospace">[1 - 91.219]</span> — which the typesetter assumed was an error and left. Privacy, it turns out, is about to become a movement, and movements leave strange marks in the margins.</p>
       <p style="font-size:20px;font-weight:bold;margin:18px 0 3px">The phone leaves the desk for good</p>
       <p style="font-size:14px;margin:0 0 16px">2007 — A glass rectangle puts the whole web in a pocket. The desk, and the privacy that came with sitting at one, will not be missed until it is gone.</p>
       <p style="font-size:20px;font-weight:bold;margin:18px 0 3px">A financial crisis no website predicted</p>
       <p style="font-size:14px;margin:0 0 16px">2008 — The models were confident. The models were wrong. Trust in large opaque systems takes a beating it will not fully recover from.</p>
       <p style="font-size:20px;font-weight:bold;margin:18px 0 3px">"The cloud" sells back what you owned</p>
       <p style="font-size:14px;margin:0 0 16px">2009 — Your files move to someone else's computers, and you pay monthly for the privilege. A quiet privacy project called BLACKOUT posts its first public build the same year. Almost nobody notices.</p>
+      <p style="font-size:20px;font-weight:bold;margin:18px 0 3px">BLACKOUT surges as the hunt for the "founder" drags on</p>
+      <p style="font-size:14px;margin:0 0 16px">BLACKOUT is gaining ever more popularity as the intelligence community continues hunting the "founder" — the unnamed figure said to control the relay no agency has been able to seize. The more they hunt, the more people route through it. Sources who would know aren't talking, and the ones who did have gone quiet.</p>
       <div style="border-top:1px solid #b8b09a;margin-top:14px;padding-top:6px;font-size:11px;color:#555;text-align:center">© The Millennium Post · archived · all dates approximate</div></div>` },
 
   /* fragment carrier 2 — a long buffer of pure random noise. holds [2 - 237] hidden mid-page. */
@@ -1877,6 +1879,34 @@ const GLOBAL_WEB={
       return `<div style="background:#0a0a0a;color:#5c5;font-family:monospace;font-size:12px;line-height:1.4;padding:14px"><div style="color:#474">recovered buffer · dumping 0x00–0x63 · the rest is gone</div><pre style="white-space:pre-wrap;color:#6a6;margin:8px 0">`+lines.join("\n")+`</pre></div>`;
     })() }
 };
+// global slow "download" — torrent-style: crawling %, jittery speed, peers, stalls. honours the slow
+// internet (connection-tier upgrades speed it up, like page loads). any in-world download routes through this.
+function downloadFile(name, sizeMB, onDone){
+  if(document.getElementById('dl-overlay')) return;
+  let mult=1; if(ownsTool('line')) mult=0.18; else if(ownsTool('wifi')) mult=0.5;
+  const total=Math.round((9000+Math.random()*7000)*mult);   // ~9–16s on stock internet, much less with upgrades
+  const ov=document.createElement('div'); ov.id='dl-overlay';
+  ov.style.cssText='position:fixed;inset:0;z-index:9990;background:rgba(0,0,20,.5);display:flex;align-items:center;justify-content:center';
+  ov.innerHTML=`<div style="width:360px;background:#c0c0c0;border:3px outset #fff;font-family:Verdana,sans-serif;color:#000">
+    <div style="background:linear-gradient(#3a3aa0,#1a1a60);color:#fff;font-size:12px;font-weight:bold;padding:4px 8px">Downloading ${esc(name)}</div>
+    <div style="padding:14px">
+      <div style="height:18px;border:2px inset #888;background:#fff;padding:1px"><div class="dl-bar" style="height:100%;width:0%;background:repeating-linear-gradient(90deg,#1a1a90,#1a1a90 8px,#3a3ac0 8px,#3a3ac0 16px)"></div></div>
+      <div class="dl-stat" style="font-size:11px;color:#333;margin-top:6px;font-family:monospace">connecting to peers…</div>
+    </div></div>`;
+  document.body.appendChild(ov);
+  const bar=ov.querySelector('.dl-bar'), stat=ov.querySelector('.dl-stat');
+  let pct=0, t0=Date.now();
+  const timer=setInterval(()=>{
+    const stall=Math.random()<0.18;                       // torrents stall
+    if(!stall) pct=Math.min(100, pct + (100/(total/300))*(0.4+Math.random()*1.4));
+    bar.style.width=pct.toFixed(0)+'%';
+    const spd=stall?0:Math.round(8+Math.random()*120);
+    const peers=2+Math.floor(Math.random()*9);
+    const doneMB=(sizeMB*pct/100).toFixed(2);
+    stat.textContent=`${pct.toFixed(0)}%  ·  ${doneMB}/${sizeMB} MB  ·  ${spd} KB/s  ·  ${peers} peers${stall?'  ·  stalled…':''}`;
+    if(pct>=100){ clearInterval(timer); stat.textContent=`complete · ${sizeMB} MB`; setTimeout(()=>{ ov.remove(); if(onDone) onDone(); },400); }
+  },300);
+}
 // the classic "YOU ARE AN IDIOT" gag — entirely in-page, downloads nothing, dismissable.
 let _idiotTimer=null;
 function killIdiotVirus(){ if(_idiotTimer){ clearInterval(_idiotTimer); _idiotTimer=null; } const ov=document.getElementById('idiot-overlay'); if(ov) ov.remove(); }
