@@ -377,7 +377,7 @@ const CONTRACTS = [
   }
 },
 {
-  id:"glass-house", name:"Glass House", difficulty:"HIGH", payout:"₿42",
+  id:"glass-house", name:"Glass House", difficulty:"MEDIUM", payout:"₿12",
   tags:["MULTI-STAGE","LATERAL MOVE","HIDDEN FS","TRACED CORE"],
   desc:"Burn a buried audit at Veridian Dynamics. No direct route in — socially engineer a front-desk login, pivot to the internal file server, then find the file yourself. The core is watched.",
   world:{
@@ -465,7 +465,7 @@ const CONTRACTS = [
   }
 },
 {
-  id:"cold-inbox", name:"Cold Inbox", difficulty:"HIGH", payout:"₿38",
+  id:"cold-inbox", name:"Cold Inbox", difficulty:"MEDIUM", payout:"₿10",
   tags:["NO PROFILE","EMAIL PIVOT","PASSWORD RESET"],
   desc:"Marcus Vance is a fixer who keeps leverage on people — including our client. He's a ghost: no socials, nothing to social-engineer. The way in is his inbox. Pivot through a password reset and burn the dossier.",
   world:{
@@ -554,7 +554,7 @@ const CONTRACTS = [
   }
 },
 {
-  id:"sideline", name:"Sideline", difficulty:"MEDIUM", payout:"₿14",
+  id:"sideline", name:"Sideline", difficulty:"MEDIUM", payout:"₿7",
   tags:["EXFIL","SOCIAL ENG.","TRACED"],
   desc:"Meridian's procurement lead is sitting on a sealed rival bid. The client wants a copy — quietly. Get in, pull the file to your box, get out. Don't destroy anything; just take it.",
   world:{
@@ -615,7 +615,7 @@ const CONTRACTS = [
   }
 },
 {
-  id:"daylight", name:"Daylight", difficulty:"HIGH", payout:"₿50",
+  id:"daylight", name:"Daylight", difficulty:"MEDIUM", payout:"₿10",
   tags:["EXFIL","LEAK","TRACED"],
   desc:"A pharma exec buried a trial result that should have gone public. Pull the data off his machine and put it somewhere it can't be hidden again — a leak drop the client trusts.",
   world:{
@@ -680,7 +680,7 @@ const CONTRACTS = [
   }
 },
 {
-  id:"atrium", name:"Open House", difficulty:"HIGH", payout:"₿45",
+  id:"atrium", name:"Open House", difficulty:"MEDIUM", payout:"₿12",
   tags:["MULTI-PAGE SITE","EMPLOYEE PORTAL","EXFIL"],
   desc:"Atrium Capital is closing a secret acquisition. The client wants the deal memo. Their website is your map — find the right employee, walk in through the staff portal, and pull the file from the partner's desk.",
   world:{
@@ -793,7 +793,7 @@ const CONTRACTS = [
   }
 },
 {
-  id:"the-favour", name:"The Favour", difficulty:"MEDIUM", payout:"₿12",
+  id:"the-favour", name:"The Favour", difficulty:"LOW", payout:"₿4",
   tags:["SINGLE TARGET","SOCIAL ENG.","LEAK"],
   desc:"A jittery client is certain his oldest friend is keeping a file on him — and might use it. He wants that file pulled and dropped to him, quietly. It's a personal laptop: no monitoring, no trace. But you'll have to read a man's whole life to guess his password.",
   world:{
@@ -2322,16 +2322,29 @@ const CMD={
   /* ---- bought tools (payloadmarket). each behaves as "not installed" until owned. ---- */
   nmap(arg){
     if(!ownsTool('nmap')){ line("nmap: command not found. (buy it from payloadmarket.onion)","c-amber"); return; }
-    if(!W){ line("no active contract.","c-amber"); return; }
-    const visible=W.machines.filter(m=>S.knownSubnets.has(m.subnet));
-    if(!visible.length){ line("nmap: no reachable hosts on a known subnet.","c-dim"); return; }
-    const ports=["22/tcp ssh","80/tcp http","139/tcp netbios","445/tcp smb","3389/tcp rdp"];
-    line(`nmap — deep scan of ${[...S.knownSubnets].join(', ')} ...`,'c-dim');
-    visible.forEach(m=>{ const ps=ports.slice(0,2+(hashStr(m.ip)%3));
-      p(`  <span class="c-white">${m.ip}</span> <b>${m.hostname}</b>${m.ids?' <span class="c-red">[IDS — connecting loud gets you traced]</span>':' <span class="c-cyan">[no IDS]</span>'}`);
+    const hosts=(W&&W.machines)||[];
+    const ports=["22/tcp ssh","80/tcp http","139/tcp netbios","445/tcp smb","3389/tcp rdp","8080/tcp http-proxy"];
+    const fingerprint=(m)=>{ const ps=ports.slice(0,2+(hashStr(m.ip)%4));
+      p(`  <span class="c-white">${m.ip}</span> <b>${m.hostname}</b>${m.ids?' <span class="c-red">[IDS — a loud login gets traced]</span>':' <span class="c-cyan">[no IDS]</span>'}`);
       p(`     <span class="c-dim">open: ${ps.join(', ')}</span>`);
-      if(m.reveals_subnet) p(`     <span class="c-cyan">routes to ${m.reveals_subnet}</span>`);
-    });
+      if(m.reveals_subnet) p(`     <span class="c-cyan">routes to ${m.reveals_subnet}</span>`); };
+    if(!arg){ line("usage: nmap <ip>  ·  nmap <subnet>  ·  nmap -a   (enumerate every reachable subnet)","c-dim"); return; }
+    if(arg==='-a'){                                  // the sophisticated capability: map adjacent subnets
+      if(!hosts.length){ line("nmap -a: nothing reachable from here.","c-dim"); return; }
+      const subs=[...new Set(hosts.map(m=>m.subnet))];
+      line("nmap -a — enumerating reachable subnets across the relay path ...","c-dim");
+      subs.forEach(s=>{ const known=S.knownSubnets.has(s); S.knownSubnets.add(s);
+        p(`  <span class="c-cyan">${s}</span> <span class="c-dim">— ${hosts.filter(m=>m.subnet===s).length} host(s)${known?'':' <span class="c-amber">[newly mapped]</span>'}</span>`); });
+      line("  all subnets registered. scan or connect into any of them.","c-dim"); return;
+    }
+    if(/^\d+\.\d+\.\d+\.\d+\/\d+$/.test(arg)){       // targeted subnet
+      const inSub=hosts.filter(m=>m.subnet===arg); S.knownSubnets.add(arg);
+      if(!inSub.length){ line(`nmap ${arg}: no live hosts.`,"c-dim"); return; }
+      line(`nmap ${arg} — deep scan ...`,"c-dim"); inSub.forEach(fingerprint); return;
+    }
+    const m=hosts.find(x=>x.ip===arg);               // targeted host
+    if(!m){ line(`nmap ${arg}: no response. (give an ip, a subnet, or -a)`,"c-amber"); return; }
+    line(`nmap ${arg} — fingerprinting host ...`,"c-dim"); fingerprint(m);
   },
   dirscan(arg){
     if(!ownsTool('dirscan')){ line("dirscan: command not found. (buy it from payloadmarket.onion)","c-amber"); return; }
