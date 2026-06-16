@@ -244,7 +244,7 @@
 /* ============================================================================
    BLACKOUT — single source of truth for the version number
    ========================================================================== */
-const VERSION = '0.8.0';
+const VERSION = '0.9.0';
 
 /* ============================================================================
    PLAYER PROGRESS — money + completed contracts (persisted to localStorage)
@@ -901,6 +901,103 @@ const CONTRACTS = [
             one of these days. (it's not getting changed.)</div>` }
     }},
     solution_path:["friendwall→Rusty+1989 (buried)","prolink/truenorth→handle mbell","laptop is exposed (172.16.9.0/24) → scan","wordlist→Rusty1989","connect mbell@172.16.9.24 (no IDS, silent) → exfil about_daniel.txt → disconnect → upload vaultdrop.onion"]
+  }
+},
+{
+  id:"cold-storage", name:"Cold Storage", difficulty:"HIGH", payout:"₿55",
+  tags:["MULTI-STAGE","20-MIN DEADLINE","NEEDS NMAP","COMBO"],
+  desc:"A data-broker is selling a journalist's source list to the people those sources informed on — pickup is in 20 minutes. Breach their network, pull the list, destroy the broker's copy so it can't be re-sold, and leak it somewhere safe. The clock is real. You'll need tools.",
+  world:{
+    mission:{
+      handle:"root", gender:"male",
+      target_name:"Julian Dorne", target_role:"Records Archivist — Cold Storage Data",
+      objective_type:"combo",
+      target_artifact:"/srv/archive/source_list.kdbx",
+      shred_target:"/srv/archive/.bak/source_list.copy",
+      leak_dest:"whistlehub.onion",
+      window_seconds:1200,
+      constraint:"before the 09:00 pickup — 20 minutes, real time",
+      briefing:[
+        "A broker is about to sell a journalist's source list to the worst possible",
+        "buyers. Pickup is in TWENTY MINUTES — that clock is real, it does not pause.",
+        "Their network: a public kiosk box is the way in (crack it from what their",
+        "site tells you). Inside, you'll find their corporate portal and who runs it.",
+        "The archivist's password leaked years ago and he never reset it — find the",
+        "dump. Map the internal network (you'll need nmap -a), sign into the portal,",
+        "and it hands you the archive server. Then: EXFIL the list, SHRED the broker's",
+        "copy, disconnect, and UPLOAD to the drop. In that order. Go."
+      ]
+    },
+    facts:{
+      cname:{label:"Company shorthand", value:"coldstore", type:"cred"},
+      yr:{label:"Founded", value:"2019", type:"cred"},
+      fmt:{label:"Email format", value:"[first-initial][last]@coldstorage-data.com", type:"lead"},
+      edgebox:{label:"Public kiosk box", value:"kiosk@10.50.0.5", type:"lead"},
+      breachpw:{label:"Dorne's leaked password (never reset)", value:"Hawthorne!92", type:"lead"}
+    },
+    machines:[
+      { ip:"10.50.0.5", hostname:"cs-edge", label:"Cold Storage — public kiosk terminal",
+        subnet:"10.50.0.0/24", exposed:true, ids:true, trace_seconds:70, hidden_fs:false, home:"/var/www",
+        account:{user:"kiosk", password:"Coldstore2019"},
+        files:{
+          "/var/www/portal_setup.txt":"Corporate portal: csportal.onion. Portal admin: jdorne (Julian Dorne, archivist).\nInternal systems live on the 10.60.9.0/24 segment — it won't show on a basic scan, you'll need to map it (nmap -a).",
+          "/var/www/index.html":"[static] Cold Storage Data — public status kiosk. nothing sensitive here."
+        }
+      },
+      { ip:"10.60.9.20", hostname:"cs-archive", label:"Cold Storage — archive file server",
+        subnet:"10.60.9.0/24", ids:false, trace_seconds:0, hidden_fs:false, home:"/srv/archive",
+        account:{user:"jdorne", password:"Hawthorne!92"},
+        files:{
+          "/srv/archive/source_list.kdbx":"[KeePass DB · 2.1MB] the journalist's source list — names, locations, contact methods. THE asset. exfil this.",
+          "/srv/archive/.bak/source_list.copy":"[backup copy] the broker's working copy, staged for the buyer. shred THIS so it can't be re-sold.",
+          "/srv/archive/readme.txt":"archive server. nightly sync. — do not keep working copies in .bak. (nobody listens.)"
+        }
+      }
+    ],
+    web:{ start:"torch://search", sites:{
+      "torch://search":{ type:"search" },
+      "coldstorage-data.com/about":{ skin:'corp', discover:["cname","yr","fmt"],
+        keywords:"cold storage data archival records firm coldstore broker company about",
+        title:"Cold Storage Data — About", html:`<div class="brand"><div class="bz">CS</div><h1>Cold Storage Data</h1></div>
+          <div class="nav"><a data-url="coldstorage-data.com/about">About</a><a data-url="coldstorage-data.com/status">Status</a></div>
+          <p>Founded in <b>2019</b>, Cold Storage Data ("<b>ColdStore</b>") provides long-term records archival and
+          secure cold storage for corporate and private clients. Discretion is our product.</p>
+          <p class="muted">Staff email follows <b>[first initial][last name]@coldstorage-data.com</b>. Records team led by
+          archivist <b>Julian Dorne</b> (jdorne).</p>` },
+      "coldstorage-data.com/status":{ skin:'corp', discover:["edgebox"],
+        keywords:"cold storage status kiosk public terminal it systems network", title:"Cold Storage — System Status",
+        html:`<div class="brand"><div class="bz">CS</div><h1>System Status</h1></div>
+          <div class="nav"><a data-url="coldstorage-data.com/about">About</a></div>
+          <div class="card">All systems operational.</div>
+          <div class="card muted">Public status kiosk: host <b>cs-edge</b> at <b>10.50.0.5</b>, service account <b>kiosk</b>.
+            (kiosks use a standard account — name + founding year, per the old IT policy nobody updated.)</div>
+          <div class="card muted">Internal archive systems are not publicly routable.</div>` },
+      "leakbase.onion/q/julian-dorne":{ discover:["breachpw"],
+        keywords:"julian dorne jdorne breach leak dump password coldstorage hawthorne", title:"LeakBase — j. dorne",
+        html:`<h1>LeakBase <span class="muted" style="font-size:12px">· breach index</span></h1>
+          <p class="muted">1 result for "julian dorne".</p>
+          <div class="card">Hawthorne Forums breach (2019)<br>
+            email: <b>jdorne@coldstorage-data.com</b><br>password: <b>Hawthorne!92</b><br>
+            <span class="muted">old dump — validity unverified. (see pastedump for whether he ever reset it.)</span></div>` },
+      "pastedump.onion/cs-it":{ keywords:"cold storage it password reset dorne email thread paste",
+        title:"pastedump — cs-it thread", html:`<h1>pastedump</h1><div class="muted">anonymous paste · cs internal IT thread (leaked)</div>
+          <div class="card"><b>From:</b> IT &lt;it@coldstorage-data.com&gt;<br><b>To:</b> jdorne<br>
+            <span class="muted">Your credentials appeared in the Hawthorne breach. Reset your password immediately.</span></div>
+          <div class="card"><b>From:</b> jdorne<br>
+            <span class="muted">yeah yeah. I'll do it later, probably. it's a forum from 2009, who cares.</span></div>
+          <div class="card muted">[thread ends. no reset was ever logged.]</div>` },
+      "csportal.onion":{ type:"service", title:"Cold Storage — Corporate Portal",
+        keywords:"cold storage corporate portal login csportal jdorne archive",
+        service:{ name:"Cold Storage Portal", kind:"portal",
+          account:{user:"jdorne", password:"Hawthorne!92"},
+          contents_html:`<div class="card"><b>Archive Server</b><br>
+            <span class="muted">host:</span> cs-archive &nbsp; <span class="muted">addr:</span> 10.60.9.20<br>
+            <span class="muted">login:</span> jdorne / <b>Hawthorne!92</b> &nbsp;<span class="muted">(same as portal — he reuses it)</span></div>
+            <div class="card muted">The archive sits on 10.60.9.0/24. Map the segment (nmap -a) before you can route to it.</div>`,
+          on_open:{ cred:{user:"jdorne", ip:"10.60.9.20", password:"Hawthorne!92", note:"archive server, from the portal"} } }
+      }
+    }},
+    solution_path:["about→coldstore+2019+fmt","status→kiosk@10.50.0.5","wordlist→Coldstore2019→crack/connect kiosk (IDS, can disconnect)","read portal_setup→csportal+jdorne","leakbase+pastedump→Hawthorne!92 (never reset)","portal login jdorne→archive creds+IP","nmap -a→register 10.60.9.0/24 (gate)","connect jdorne@10.60.9.20→exfil source_list→shred .bak copy→disconnect→upload whistlehub.onion — all under 20:00"]
   }
 }
 ];
@@ -1900,9 +1997,9 @@ let out,cmd,urlBar,pageEl,promptEl,traceEl;
 function resetState(){
   S.discovered=new Set(); S.wordlist=null; S.cracked=new Set();
   S.conn=null; S.cwd=HOME.home; S.knownSubnets=new Set(); S.foundCreds={};
-  S.seeds=[]; S.auth=new Set(); S.loud=new Set(); S.exfilDone=false; S.objComplete=false; S.done=false;
+  S.seeds=[]; S.auth=new Set(); S.loud=new Set(); S.exfilDone=false; S.shredDone=false; S.objComplete=false; S.done=false;
   S.scrapeLevel=0;
-  stopTrace();
+  stopTrace(); stopWindow();
 }
 function activeHost(){ return S.conn ? W.machines.find(m=>m.ip===S.conn) : HOME; }
 function updatePrompt(){ if(promptEl) promptEl.innerHTML=`root@${S.conn?activeHost().hostname:'localhost'}:~$&nbsp;`; }
@@ -2240,7 +2337,7 @@ function stopTrace(){ if(S.traceTimer)clearInterval(S.traceTimer); S.traceTimer=
   if(traceEl){ traceEl.classList.remove('live'); traceEl.textContent=''; } paintTBStatus(); }
 function paintTrace(){ const txt=`TRACE ${String(S.trace).padStart(2,'0')}s`; if(traceEl) traceEl.textContent=txt; paintTBStatus(); }
 function caught(){
-  S.conn=null; stopTrace(); updatePrompt();
+  S.conn=null; stopTrace(); stopWindow(); updatePrompt();
   line(""); line("████ CONNECTION TRACED. Counter-intrusion locked your relay. ████","c-red");
   line("CONTRACT FAILED. Open Contracts to pick another job.","c-red"); lockInput();
 }
@@ -2330,12 +2427,17 @@ const CMD={
       if(m.reveals_subnet) p(`     <span class="c-cyan">routes to ${m.reveals_subnet}</span>`); };
     if(!arg){ line("usage: nmap <ip>  ·  nmap <subnet>  ·  nmap -a   (enumerate every reachable subnet)","c-dim"); return; }
     if(arg==='-a'){                                  // the sophisticated capability: map adjacent subnets
-      if(!hosts.length){ line("nmap -a: nothing reachable from here.","c-dim"); return; }
+      line("nmap -a — enumerating everything reachable across the relay path ...","c-dim");
       const subs=[...new Set(hosts.map(m=>m.subnet))];
-      line("nmap -a — enumerating reachable subnets across the relay path ...","c-dim");
-      subs.forEach(s=>{ const known=S.knownSubnets.has(s); S.knownSubnets.add(s);
-        p(`  <span class="c-cyan">${s}</span> <span class="c-dim">— ${hosts.filter(m=>m.subnet===s).length} host(s)${known?'':' <span class="c-amber">[newly mapped]</span>'}</span>`); });
-      line("  all subnets registered. scan or connect into any of them.","c-dim"); return;
+      if(subs.length){ line("  contract subnets:","c-dim");
+        subs.forEach(s=>{ const known=S.knownSubnets.has(s); S.knownSubnets.add(s);
+          p(`    <span class="c-cyan">${s}</span> <span class="c-dim">— ${hosts.filter(m=>m.subnet===s).length} host(s)${known?'':' <span class="c-amber">[newly mapped]</span>'}</span>`); }); }
+      // external relay nodes — the scrape/relay-hacking targets (cached for the session)
+      if(!window._relayTargets){ window._relayTargets=[]; const seen=new Set();
+        const n=6+Math.floor(Math.random()*5); while(window._relayTargets.length<n){ const ip=randRelayIP(); if(!seen.has(ip)){ seen.add(ip); window._relayTargets.push(ip); } } }
+      line("  other relays in range:","c-dim");
+      window._relayTargets.forEach(ip=>p(`    <span class="c-white">${ip}</span> <span class="c-dim">— relay node · unowned</span>`));
+      line("  contract subnets registered. external relays are fair game for scraping.","c-dim"); return;
     }
     if(/^\d+\.\d+\.\d+\.\d+\/\d+$/.test(arg)){       // targeted subnet
       const inSub=hosts.filter(m=>m.subnet===arg); S.knownSubnets.add(arg);
@@ -2473,9 +2575,12 @@ const CMD={
     line(`  copied to ~/loot/${base} on your box.`,'c-cyan');
     if(path===W.mission.target_artifact){
       if(W.mission.objective_type==='exfil'){ S.objComplete=true; line("► objective file secured. `disconnect` to finish.","c-amber"); }
-      else if(W.mission.objective_type==='leak'){ S.exfilDone=true; line(`► got it. now \`disconnect\`, then \`upload ${W.mission.leak_dest}\`.`,"c-amber"); } } },
+      else if(W.mission.objective_type==='leak'){ S.exfilDone=true; line(`► got it. now \`disconnect\`, then \`upload ${W.mission.leak_dest}\`.`,"c-amber"); }
+      else if(W.mission.objective_type==='combo'){ S.exfilDone=true; line("► the list is on your box. now `shred` the broker's copy, then `disconnect` and `upload`.","c-amber"); } } },
   async upload(arg){
-    if(W.mission.objective_type!=='leak'){ line("upload: this contract isn't a leak job.","c-dim"); return; }
+    const obj=W.mission.objective_type;
+    if(obj!=='leak' && obj!=='combo'){ line("upload: this contract isn't a leak job.","c-dim"); return; }
+    if(obj==='combo' && !S.shredDone){ line("the broker still has their copy — `shred` it before you publish, or it just gets re-sold.","c-amber"); return; }
     if(!S.exfilDone){ line("nothing staged. `exfil` the target file first.","c-amber"); return; }
     if(!arg){ line(`usage: upload ${W.mission.leak_dest||'<drop>'}`,"c-dim"); return; }
     if(arg!==W.mission.leak_dest){ line(`upload: ${arg}: not the drop the client specified.`,"c-amber"); return; }
@@ -2486,6 +2591,18 @@ const CMD={
   async shred(arg){ const m=conn(); if(!m)return;
     const path=m.hidden_fs?resolvePath(S.cwd,arg):arg;
     if(!(path in m.files)){ line(`shred: ${arg}: no such file`,'c-amber'); return; }
+    const obj=W.mission.objective_type;
+    if(obj==='combo'){
+      if(path===W.mission.target_artifact){   // shredding the LIST itself = catastrophe
+        await typeLine(`shredding ${path}`,'c-red',3); delete m.files[path];
+        failContract("you shredded the source list itself — there's nothing left to deliver"); return; }
+      if(path!==W.mission.shred_target){ line(`shred: refusing — ${arg} isn't part of the job.`,'c-amber'); return; }
+      await typeLine(`shredding ${path}`,'c-red',3);
+      for(let i=0;i<=100;i+=20){ await sleep(140); line(`  overwriting pass ${i/20+1}/6  [${'█'.repeat(i/10)}${'░'.repeat(10-i/10)}]`,'c-dim'); }
+      delete m.files[path]; S.shredDone=true;
+      line("  the broker's copy is gone — it can't be re-sold.","c-red");
+      line(S.exfilDone?`► copy destroyed. now \`disconnect\`, then \`upload ${W.mission.leak_dest}\`.`:"► copy destroyed — but `exfil` the list before you leave.","c-amber"); return;
+    }
     if(path!==W.mission.target_artifact){ line(`shred: refusing — ${arg} is not the contract target.`,'c-amber'); return; }
     await typeLine(`shredding ${path}`,'c-red',3);
     for(let i=0;i<=100;i+=20){ await sleep(160); line(`  overwriting pass ${i/20+1}/6  [${'█'.repeat(i/10)}${'░'.repeat(10-i/10)}]`,'c-dim'); }
@@ -2574,7 +2691,7 @@ const CMD={
 };
 function completeContract(){ if(S.objComplete && !S.done) win(); }
 function failContract(reason){
-  if(S.done) return; S.done=true; stopTrace(); if(S.conn){ S.conn=null; updatePrompt(); }
+  if(S.done) return; S.done=true; stopTrace(); stopWindow(); if(S.conn){ S.conn=null; updatePrompt(); }
   line(""); line("════════════════════════════════════════════","c-red");
   line(" ✖ CONTRACT FAILED — "+(reason||'objective blown')+".","c-red");
   line("════════════════════════════════════════════","c-red");
@@ -2664,7 +2781,7 @@ async function crackAnim(m,user,ip){
     else line(`  still not in the list. you're missing a clue — keep digging, then re-gen the wordlist.`,'c-amber');
   }
 }
-function win(){ S.done=true; stopTrace();
+function win(){ S.done=true; stopTrace(); stopWindow();
   const paid=activeContract && !PROGRESS.completed.includes(activeContract.id);
   S.conn=null; S.cwd=HOME.home; updatePrompt();   // back on your own box
   line(""); line("════════════════════════════════════════════","c-cyan");
@@ -2764,6 +2881,8 @@ async function boot(c){
   if(g!==runGen) return; renderDossier();
   for(const l of W.mission.briefing){ if(g!==runGen) return; await typeLine("  "+l,"c-amber",3); }
   if(g!==runGen) return;
+  if(W.mission.window_seconds){ const mins=Math.round(W.mission.window_seconds/60);
+    line(`⚠ HARD DEADLINE: you have ${mins} minutes. the clock is running NOW.`,"c-red"); startWindow(W.mission.window_seconds); }
   line(""); line("Type `help` for commands. Recon starts in the Torch Browser →","c-dim"); line("");
   paintTBStatus();
 }
@@ -2907,7 +3026,22 @@ function paintTBStatus(){
   const el=document.getElementById('tb-status'); if(!el) return;
   const c=el.dataset.contract||'';
   const tr=S.trace!=null?`<span class="tr live">TRACE ${String(S.trace).padStart(2,'0')}s</span>`:'';
-  el.innerHTML=(c?`${esc(c)} `:'')+tr;
+  let win='';
+  if(S.window!=null){ const m=Math.floor(S.window/60), s=S.window%60;
+    const cls=S.window<=120?'tr live':'';   // last 2 min: red + blink
+    win=`<span class="${cls}" style="margin-right:8px">WINDOW ${m}:${String(s).padStart(2,'0')}</span>`; }
+  el.innerHTML=(c?`${esc(c)} `:'')+win+tr;
+}
+/* real-time contract deadline (separate from per-host trace). */
+function startWindow(sec){
+  S.window=sec; paintTBStatus();
+  S.windowTimer=setInterval(()=>{ S.window--; paintTBStatus(); if(S.window<=0){ clearInterval(S.windowTimer); S.windowTimer=null; windowExpired(); } },1000);
+}
+function stopWindow(){ if(S.windowTimer) clearInterval(S.windowTimer); S.windowTimer=null; S.window=null; paintTBStatus(); }
+function windowExpired(){
+  if(S.done) return; stopWindow();
+  if(S.conn){ S.conn=null; updatePrompt(); }
+  failContract("the buyer's pickup completed — the list is gone, and so is your fee");
 }
 function tickClock(){ const d=new Date(); document.getElementById('clock').textContent=
   String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
